@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GC Advising Center</title>
+  <title>Materials | GC Advising Center</title>
   <meta
     name="description"
-    content="GC Advising Center with workshop materials, advisor profiles, weekday evening duty schedule, and Piazza access."
+    content="Workshop archive and materials for the GC Advising Center."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
   >
   <link rel="stylesheet" href="./assets/styles.css">
 </head>
-<body data-page="home">
+<body data-page="materials">
   <div class="page-shell">
     <header class="topbar panel panel--nav">
       <a class="brand" href="./index.html"><img class="brand__logo" src="./assets/GCAC.png" alt="GC Advising Center logo"><span class="brand__text" id="brandText"></span></a>
@@ -24,13 +24,18 @@
     </header>
 
     <main class="main-layout">
-      <section class="hero hero--home panel panel--hero">
-        <div class="hero__copy hero__copy--wide">
-          <p class="eyebrow" id="siteTagline"></p>
-          <h1 id="siteTitle"></h1>
-          <p class="hero__description" id="siteDescription"></p>
+      <section class="subpage-hero panel">
+        <p class="eyebrow" id="pageKicker"></p>
+        <h1 id="pageTitle"></h1>
+        <p class="hero__description" id="pageDescription"></p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <p class="section-kicker" id="materialsArchiveKicker"></p>
+          <h2 id="materialsArchiveTitle"></h2>
         </div>
-        <div class="hero__meta" id="homeEntryCards"></div>
+        <div class="material-list material-list--archive" id="materialsArchive"></div>
       </section>
     </main>
   </div>

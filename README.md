@@ -1,46 +1,69 @@
 # GitHub Pages Course Information Site
 
-This is a static website template designed to be hosted directly on GitHub Pages.
+This repo uses a multi-page layout with a top navigation bar, and the workshop archive is now driven by a Markdown source file.
 
-## Structure
+## Main Pages
 
-- `index.html`: page structure
-- `assets/styles.css`: styling
-- `assets/app.js`: rendering logic
-- `content/site-content.js`: main content configuration, which is the file you will usually edit
+- `index.html`: home page with the latest 3 workshop items and links to the other sections
+- `materials.html`: full workshop archive
+- `advisors.html`: advisor directory
+- `schedule.html`: Monday-Friday evening duty table
+- `piazza.html`: Piazza entry page and guidance
 
-## How To Update Content
+## Files You Will Usually Edit
 
-Open `content/site-content.js` and edit the sections you need:
+- `content/workshops.md`: workshop archive source used by the home page preview and the Materials page
+- `content/site-content.js`: site text for navigation, hero content, advisors, schedule, and Piazza
+- `assets/styles.css`: shared styling
+- `assets/app.js`: shared rendering and Markdown parsing logic
 
-- `site`: page title and description
-- `heroMeta`: top-right summary cards
-- `quickLinks`: useful links
-- `dutySchedule`: duty schedule for the semester
-- `piazza`: Piazza-related notes
-- `advisors`: advisor profiles
+## How To Add A New Workshop Entry
 
-If you are only updating content, you usually do not need to touch the HTML or CSS files.
+The site reads workshop data directly from `content/workshops.md`.
 
-## How To Deploy On GitHub Pages
+When you add a new item:
+
+1. Open `content/workshops.md`.
+2. Add the newest entry near the top, above the older workshop items.
+3. Follow the same structure as the existing archive.
+
+Use this format:
+
+```md
+### 2026/04/12 <br>中文标题 | *English Title*
++ [预告推送](https://example.com/announcement)
++ [分享会回放](https://example.com/recording)
++ [资料存档](https://example.com/archive)
+```
+
+You can also use other existing resource labels that already appear in the archive, such as:
+
+- `共享文档`
+- `回顾推送`
+- `总结推送`
+- `推送链接`
+
+Notes:
+
+- Keep the date at the start of the `###` heading.
+- Keep the Chinese title before the separator and the English title after it.
+- The parser supports both `| *English Title*` and `- *English Title*` patterns.
+- If a resource is temporarily unavailable, you can leave it as plain text, but only linked items will appear as clickable links on the site.
+- Some older JBox links may require SJTU VPN. That reminder is already reflected in the Materials section copy.
+
+## How The Materials Section Works
+
+- The home page shows the first 3 workshop entries from `content/workshops.md`.
+- The Materials page shows the full parsed archive.
+- To keep the newest items on the home page, always insert new entries near the top of `content/workshops.md`.
+
+## GitHub Pages Deployment
 
 1. Push this repository to GitHub.
 2. Open the repository `Settings`.
 3. Go to `Pages`.
 4. Under `Build and deployment`, choose:
    - `Source`: `Deploy from a branch`
-   - `Branch`: `main` (or your default branch)
-   - Folder: `/ (root)`
-5. Save and wait for GitHub to publish the site.
-
-After deployment, the URL will usually look like this:
-
-`https://your-username.github.io/your-repository-name/`
-
-If you later want to:
-
-- turn the duty schedule into a table
-- manage content with Markdown
-- add search, filtering, or a denser mobile layout
-
-this template is a good starting point to extend from.
+   - `Branch`: `main`
+   - `Folder`: `/ (root)`
+5. Save and wait for the site to publish.
