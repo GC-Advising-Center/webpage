@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Information Hub</title>
+  <meta
+    name="description"
+    content="A GitHub Pages-friendly course information site for duty schedules, Piazza details, and advisor profiles."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow" id="siteTagline"></p>
+        <h1 id="siteTitle"></h1>
+        <p class="hero__description" id="siteDescription"></p>
+      </div>
+      <div class="hero__meta" id="siteMeta"></div>
+    </header>
+
+    <main>
+      <section class="quick-links panel" aria-labelledby="quickLinksHeading">
+        <div class="section-heading">
+          <p class="section-kicker">Quick Access</p>
+          <h2 id="quickLinksHeading">Useful Links</h2>
+        </div>
+        <div class="quick-links__grid" id="quickLinks"></div>
+      </section>
+
+      <section class="content-columns" aria-label="Course information columns">
+        <article class="panel column-panel">
+          <div class="section-heading">
+            <p class="section-kicker">Column 01</p>
+            <h2>Duty Schedule This Semester</h2>
+          </div>
+          <div id="dutySchedule" class="stack-list"></div>
+        </article>
+
+        <article class="panel column-panel">
+          <div class="section-heading">
+            <p class="section-kicker">Column 02</p>
+            <h2>Piazza</h2>
+          </div>
+          <div id="piazzaInfo" class="stack-list"></div>
+        </article>
+
+        <article class="panel column-panel">
+          <div class="section-heading">
+            <p class="section-kicker">Column 03</p>
+            <h2>Advisor Profiles</h2>
+          </div>
+          <div id="advisorList" class="stack-list"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="./content/site-content.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
