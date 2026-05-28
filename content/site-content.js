@@ -63,40 +63,24 @@ window.SITE_CONTENT = {
     materials: {
       kicker: { zh: "资料页面", en: "Materials" },
       title: { zh: "往期工作坊资料", en: "Past Workshop Materials" },
-      description: {
-        zh: "这个页面展示从 Markdown 存档解析出的完整 workshop 归档。部分 JBox 链接可能需要 SJTU VPN。",
-        en: "This page shows the full workshop archive parsed from the Markdown source. Some JBox links may require SJTU VPN.",
-      },
       sectionKicker: { zh: "完整归档", en: "Archive" },
       sectionTitle: { zh: "全部工作坊资料", en: "All Workshop Materials" },
     },
     advisors: {
       kicker: { zh: "顾问页面", en: "Advisors" },
       title: { zh: "Advisor 介绍", en: "Advisor Profiles" },
-      description: {
-        zh: "在这个页面中，你可以查看 Advisor 的姓名、邮箱、擅长内容和简短背景介绍。",
-        en: "Use this page to browse advisor names, email addresses, strengths, and short background notes.",
-      },
       sectionKicker: { zh: "顾问团队", en: "People" },
       sectionTitle: { zh: "Advisor 名录", en: "Advisor Directory" },
     },
     schedule: {
       kicker: { zh: "值班安排", en: "Duty Schedule" },
-      title: { zh: "工作日晚间值班覆盖", en: "Weekday Evening Coverage" },
-      description: {
-        zh: "下面的表格覆盖周一到周五的晚间值班安排，并且可以直接在数据文件中更新。",
-        en: "The schedule below covers Monday through Friday evenings and can be updated directly in the data file.",
-      },
+      title: { zh: "工作日晚间值班", en: "Weekday Evening Coverage" },
       sectionKicker: { zh: "值班覆盖", en: "Coverage" },
       sectionTitle: { zh: "周一到周五晚间值班表", en: "Monday To Friday Evening Schedule" },
     },
     piazza: {
       kicker: { zh: "Piazza", en: "Piazza" },
       title: { zh: "讨论区入口", en: "Discussion Board Access" },
-      description: {
-        zh: "这个页面为学生提供了清晰的 Piazza 入口，以及如何使用讨论区的说明。",
-        en: "This page gives students a clean way to reach Piazza and understand how it should be used.",
-      },
       sectionKicker: { zh: "社区讨论", en: "Community" },
       sectionTitle: { zh: "Piazza 入口与说明", en: "Piazza Access And Notes" },
     },
