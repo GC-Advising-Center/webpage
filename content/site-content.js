@@ -597,56 +597,49 @@ window.SITE_CONTENT = {
       },
     ],
   },
-  dutySchedule: {
-    intro: {
-      zh: "这里展示当前工作日晚间值班安排，帮助学生快速查看今天或本周该联系谁。",
-      en: "This table shows the current weekday evening duty schedule so students can quickly see who is available this week.",
-    },
-    columns: [
-      { zh: "日期", en: "Day" },
-      { zh: "时间", en: "Time" },
-      { zh: "值班顾问", en: "Advisor" },
-      { zh: "地点", en: "Location" },
-      { zh: "重点内容", en: "Focus" },
-    ],
-    rows: [
-      [
-        { zh: "周一", en: "Monday" },
-        "7:00-9:00 PM",
-        "Jane Smith",
-        { zh: "301 教室 / Zoom", en: "Room 301 / Zoom" },
-        { zh: "研究规划与 Advisor 匹配", en: "Research planning and advisor matching" },
-      ],
-      [
-        { zh: "周二", en: "Tuesday" },
-        "7:00-9:00 PM",
-        "Tom Lee",
-        { zh: "学生共享空间", en: "Student Commons" },
-        { zh: "选课规划与学生常见问题", en: "Course planning and student questions" },
-      ],
-      [
-        { zh: "周三", en: "Wednesday" },
-        "7:00-9:00 PM",
-        "Ming Chen",
-        { zh: "实验室休息区", en: "Lab Lounge" },
-        { zh: "项目范围设计与技术准备", en: "Project scoping and technical prep" },
-      ],
-      [
-        { zh: "周四", en: "Thursday" },
-        "7:00-9:00 PM",
-        "Jane Smith + Tom Lee",
-        { zh: "301 教室", en: "Room 301" },
-        { zh: "申请、CV 与 office hour 补充答疑", en: "Applications, CVs, and office-hour overflow" },
-      ],
-      [
-        { zh: "周五", en: "Friday" },
-        "7:00-9:00 PM",
-        { zh: "轮值团队", en: "Rotating Team" },
-        "Zoom",
-        { zh: "开放咨询与后续问题跟进", en: "Open advising and follow-up questions" },
-      ],
-    ],
+ dutySchedule: {
+  intro: {
+    zh: "每周一到周四晚间值班，地点龙斌楼312。单双周人员不同，同一天同时有三位顾问在场。",
+    en: "Duty runs Monday to Thursday evenings at LB312. Odd and even weeks have different advisors; three advisors are on duty each day.",
   },
+  columns: [
+    { zh: "日期", en: "Day" },
+    { zh: "时间", en: "Time" },
+    { zh: "单周顾问", en: "Odd-week Advisors" },
+    { zh: "双周顾问", en: "Even-week Advisors" },
+    { zh: "地点", en: "Location" },
+  ],
+  rows: [
+    [
+      { zh: "周一", en: "Monday" },
+      "7:00-9:00 PM",
+      "周冯铭 / 邵禹杰 / 丁越桐",
+      "王敏茜 / 王子谦 / 吴羿辰",
+      "龙斌楼 312",
+    ],
+    [
+      { zh: "周二", en: "Tuesday" },
+      "7:00-9:00 PM",
+      "戴琤妍 / 倪银晨",
+      "王子睿 / 陈文新 / 李一爱",
+      "龙斌楼 312",
+    ],
+    [
+      { zh: "周三", en: "Wednesday" },
+      "7:00-9:00 PM",
+      "王一敏 / 班雨桐 / 汤礼维",
+      "叶承嵘",
+      "龙斌楼 312",
+    ],
+    [
+      { zh: "周四", en: "Thursday" },
+      "7:00-9:00 PM",
+      "唐璟帆 / 刘乐思 / 张浩然",
+      "张果然 / 陈洁仪 / 王飞羽",
+      "龙斌楼 312",
+    ],
+  ],
+}, 
   piazza: {
     description: {
       zh: "Piazza 适合发布公告、整理可复用的问题解答，以及保留对整个课程社区都有帮助的讨论串。",
