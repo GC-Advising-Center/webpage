@@ -652,7 +652,7 @@ window.SITE_CONTENT = {
     links: [
       {
         label: { zh: "打开 Piazza", en: "Open Piazza" },
-        href: "https://piazza.com",
+        href: "https://piazza.com/class/l1hzqox6gb3293", 
         external: true,
         variant: "primary",
       },
