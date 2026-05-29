@@ -24,7 +24,7 @@ window.SITE_CONTENT = {
     { id: "materials", label: { zh: "资料", en: "Materials" }, href: "./materials.html" },
     { id: "advisors", label: { zh: "顾问", en: "Advisors" }, href: "./advisors.html" },
     { id: "schedule", label: { zh: "值班安排", en: "Duty Schedule" }, href: "./schedule.html" },
-    { id: "piazza", label: { zh: "Piazza" }, href: "./piazza.html" },
+    { id: "piazza", label: { zh: "Piazza",en:" " }, href: "./piazza.html" },
   ],
   heroActions: [],
   homeCards: [

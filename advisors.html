@@ -15,6 +15,62 @@
     rel="stylesheet"
   >
   <link rel="stylesheet" href="./assets/styles.css">
+  
+  <style>
+    .accordion-group {
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .accordion-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: rgba(0, 0, 0, 0.02);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      outline: none;
+      transition: background 0.2s ease;
+    }
+    .accordion-header:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .accordion-header h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+    .accordion-icon {
+      font-size: 1.25rem;
+      transition: transform 0.2s ease;
+      color: #64748b;
+    }
+    .accordion-group.active .accordion-icon {
+      transform: rotate(180deg);
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      padding: 0 1.5rem;
+    }
+    .accordion-group.active .accordion-content {
+      max-height: 5000px; /* 给予足够高度容纳卡片群 */
+      padding: 1.5rem;
+    }
+    /* 让折叠内部的网格继承或重用原本的网格样式 */
+    .accordion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+  </style>
 </head>
 <body data-page="advisors">
   <div class="page-shell">
@@ -35,12 +91,103 @@
           <p class="section-kicker" id="advisorDirectoryKicker"></p>
           <h2 id="advisorDirectoryTitle"></h2>
         </div>
-        <div class="advisor-grid" id="advisorList"></div>
+        <div id="accordionContainer"></div>
+        <div class="advisor-grid" id="advisorList" style="display: none;"></div>
       </section>
     </main>
   </div>
 
   <script src="./content/site-content.js"></script>
   <script src="./assets/app.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. 检查数据文件里是否有我们新设定的 groups 数组
+      const data = window.SITE_CONTENT;
+      if (!data || !data.advisors || !data.advisors.groups) return;
+
+      // 2. 自动获取当前页面的语言（遵循你的系统的语系判定，默认中文）
+      const lang = document.documentElement.lang === "en" ? "en" : "zh";
+      const container = document.getElementById("accordionContainer");
+      const expertiseLabel = data.advisors.expertiseLabel ? data.advisors.expertiseLabel[lang] : "Best for";
+
+      // 3. 循环渲染 5 个大分类
+      data.advisors.groups.forEach((group, index) => {
+        const groupTitle = group.title[lang] || group.title["zh"];
+        
+        // 创建大类包裹层
+        const groupEl = document.createElement("div");
+        groupEl.className = "accordion-group";
+        // 默认让第一组（老师）或者所有组展开，这里设置默认闭合。如果想默认全展开，可以加上 className = "accordion-group active"
+        
+        // 创建折叠栏头部按钮
+        const headerEl = document.createElement("button");
+        headerEl.className = "accordion-header";
+        headerEl.innerHTML = `
+          <h3>${groupTitle} (${group.items.length})</h3>
+          <span class="accordion-icon">▼</span>
+        `;
+        
+        // 创建内容容器层
+        const contentEl = document.createElement("div");
+        contentEl.className = "accordion-content";
+        
+        // 创建人员卡片网格
+        const gridEl = document.createElement("div");
+        gridEl.className = "accordion-grid";
+        
+        // 4. 内部循环：渲染该分类下的所有顾问卡片
+        group.items.forEach(advisor => {
+          const name = advisor.name;
+          const role = advisor.role[lang] || advisor.role["zh"];
+          const bio = advisor.bio[lang] || advisor.bio["zh"];
+          const email = advisor.email;
+          
+          // 生成专业领域的标签 HTML
+          let expertiseHtml = "";
+          if (advisor.expertise && advisor.expertise.length > 0) {
+            const tags = advisor.expertise.map(exp => `<span class="tag">${exp[lang] || exp["zh"]}</span>`).join("");
+            expertiseHtml = `
+              <div class="advisor-card__expertise">
+                <span class="expertise-label">${expertiseLabel}:</span>
+                <div class="tags-container">${tags}</div>
+              </div>
+            `;
+          }
+
+          // 构建单个人员卡片（严格复用你原本 `.panel` 里的卡片类名和结构，确保外观样式一致）
+          const cardEl = document.createElement("div");
+          cardEl.className = "advisor-card"; // 继承你原本的 CSS 样式
+          cardEl.innerHTML = `
+            <div class="advisor-card__header">
+              <h4 class="advisor-card__name">${name}</h4>
+              <p class="advisor-card__role">${role}</p>
+            </div>
+            <div class="advisor-card__body">
+              <p class="advisor-card__bio">${bio}</p>
+              ${expertiseHtml}
+            </div>
+            <div class="advisor-card__footer">
+              <a href="mailto:${email}" class="advisor-card__email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:middle;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                ${email}
+              </a>
+            </div>
+          `;
+          gridEl.appendChild(cardEl);
+        });
+        
+        contentEl.appendChild(gridEl);
+        groupEl.appendChild(headerEl);
+        groupEl.appendChild(contentEl);
+        container.appendChild(groupEl);
+        
+        // 5. 绑定点击事件：点击分类标题展开/折叠
+        headerEl.addEventListener("click", () => {
+          groupEl.classList.toggle("active");
+        });
+      });
+    });
+  </script>
 </body>
 </html>
