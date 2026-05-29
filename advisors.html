@@ -61,10 +61,9 @@
       padding: 0 1.5rem;
     }
     .accordion-group.active .accordion-content {
-      max-height: 5000px; /* 给予足够高度容纳卡片群 */
+      max-height: 5000px;
       padding: 1.5rem;
     }
-    /* 让折叠内部的网格继承或重用原本的网格样式 */
     .accordion-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -102,91 +101,112 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. 检查数据文件里是否有我们新设定的 groups 数组
       const data = window.SITE_CONTENT;
       if (!data || !data.advisors || !data.advisors.groups) return;
 
-      // 2. 自动获取当前页面的语言（遵循你的系统的语系判定，默认中文）
-      const lang = document.documentElement.lang === "en" ? "en" : "zh";
       const container = document.getElementById("accordionContainer");
-      const expertiseLabel = data.advisors.expertiseLabel ? data.advisors.expertiseLabel[lang] : "Best for";
 
-      // 3. 循环渲染 5 个大分类
-      data.advisors.groups.forEach((group, index) => {
-        const groupTitle = group.title[lang] || group.title["zh"];
-        
-        // 创建大类包裹层
-        const groupEl = document.createElement("div");
-        groupEl.className = "accordion-group";
-        // 默认让第一组（老师）或者所有组展开，这里设置默认闭合。如果想默认全展开，可以加上 className = "accordion-group active"
-        
-        // 创建折叠栏头部按钮
-        const headerEl = document.createElement("button");
-        headerEl.className = "accordion-header";
-        headerEl.innerHTML = `
-          <h3>${groupTitle} (${group.items.length})</h3>
-          <span class="accordion-icon">▼</span>
-        `;
-        
-        // 创建内容容器层
-        const contentEl = document.createElement("div");
-        contentEl.className = "accordion-content";
-        
-        // 创建人员卡片网格
-        const gridEl = document.createElement("div");
-        gridEl.className = "accordion-grid";
-        
-        // 4. 内部循环：渲染该分类下的所有顾问卡片
-        group.items.forEach(advisor => {
-          const name = advisor.name;
-          const role = advisor.role[lang] || advisor.role["zh"];
-          const bio = advisor.bio[lang] || advisor.bio["zh"];
-          const email = advisor.email;
+      // 定义核心渲染函数：根据当前语言环境(zh或en)渲染内容
+      function renderAccordion() {
+        // 1. 获取当前页面的最新语言（检测 html 标签的 lang 属性是否包含 'en'）
+        const isEn = document.documentElement.lang.toLowerCase().includes("en");
+        const lang = isEn ? "en" : "zh";
+        const expertiseLabel = data.advisors.expertiseLabel ? (data.advisors.expertiseLabel[lang] || data.advisors.expertiseLabel["zh"]) : "Best for";
+
+        // 清空容器，准备重新渲染（防止切换语言时内容重叠）
+        container.innerHTML = "";
+
+        // 2. 循环生成 5 个分组
+        data.advisors.groups.forEach((group) => {
+          const groupTitle = group.title[lang] || group.title["zh"];
           
-          // 生成专业领域的标签 HTML
-          let expertiseHtml = "";
-          if (advisor.expertise && advisor.expertise.length > 0) {
-            const tags = advisor.expertise.map(exp => `<span class="tag">${exp[lang] || exp["zh"]}</span>`).join("");
-            expertiseHtml = `
-              <div class="advisor-card__expertise">
-                <span class="expertise-label">${expertiseLabel}:</span>
-                <div class="tags-container">${tags}</div>
+          // 创建大类包裹层
+          const groupEl = document.createElement("div");
+          groupEl.className = "accordion-group";
+          
+          // 如果你希望页面刚加载时“教师团队”或“所有组”默认是展开的，可以取消下面这行的注释：
+          // groupEl.className = "accordion-group active";
+          
+          // 创建折叠栏头部
+          const headerEl = document.createElement("button");
+          headerEl.className = "accordion-header";
+          headerEl.innerHTML = `
+            <h3>${groupTitle} (${group.items.length})</h3>
+            <span class="accordion-icon">▼</span>
+          `;
+          
+          // 创建内容容器层与网格
+          const contentEl = document.createElement("div");
+          contentEl.className = "accordion-content";
+          const gridEl = document.createElement("div");
+          gridEl.className = "accordion-grid";
+          
+          // 3. 内部循环：渲染顾问卡片
+          group.items.forEach(advisor => {
+            const name = advisor.name;
+            const role = advisor.role[lang] || advisor.role["zh"];
+            const bio = advisor.bio[lang] || advisor.bio["zh"];
+            const email = advisor.email;
+            
+            // 渲染适合咨询的标签（Tags）
+            let expertiseHtml = "";
+            if (advisor.expertise && advisor.expertise.length > 0) {
+              const tags = advisor.expertise.map(exp => `<span class="tag">${exp[lang] || exp["zh"]}</span>`).join("");
+              expertiseHtml = `
+                <div class="advisor-card__expertise">
+                  <span class="expertise-label">${expertiseLabel}:</span>
+                  <div class="tags-container">${tags}</div>
+                </div>
+              `;
+            }
+
+            // 完美复用原本 CSS 的卡片组件结构
+            const cardEl = document.createElement("div");
+            cardEl.className = "advisor-card";
+            cardEl.innerHTML = `
+              <div class="advisor-card__header">
+                <h4 class="advisor-card__name">${name}</h4>
+                <p class="advisor-card__role">${role}</p>
+              </div>
+              <div class="advisor-card__body">
+                <p class="advisor-card__bio">${bio}</p>
+                ${expertiseHtml}
+              </div>
+              <div class="advisor-card__footer">
+                <a href="mailto:${email}" class="advisor-card__email">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:middle;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  ${email}
+                </a>
               </div>
             `;
-          }
-
-          // 构建单个人员卡片（严格复用你原本 `.panel` 里的卡片类名和结构，确保外观样式一致）
-          const cardEl = document.createElement("div");
-          cardEl.className = "advisor-card"; // 继承你原本的 CSS 样式
-          cardEl.innerHTML = `
-            <div class="advisor-card__header">
-              <h4 class="advisor-card__name">${name}</h4>
-              <p class="advisor-card__role">${role}</p>
-            </div>
-            <div class="advisor-card__body">
-              <p class="advisor-card__bio">${bio}</p>
-              ${expertiseHtml}
-            </div>
-            <div class="advisor-card__footer">
-              <a href="mailto:${email}" class="advisor-card__email">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:middle;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                ${email}
-              </a>
-            </div>
-          `;
-          gridEl.appendChild(cardEl);
+            gridEl.appendChild(cardEl);
+          });
+          
+          contentEl.appendChild(gridEl);
+          groupEl.appendChild(headerEl);
+          groupEl.appendChild(contentEl);
+          container.appendChild(groupEl);
+          
+          // 绑定点击事件
+          headerEl.addEventListener("click", () => {
+            groupEl.classList.toggle("active");
+          });
         });
-        
-        contentEl.appendChild(gridEl);
-        groupEl.appendChild(headerEl);
-        groupEl.appendChild(contentEl);
-        container.appendChild(groupEl);
-        
-        // 5. 绑定点击事件：点击分类标题展开/折叠
-        headerEl.addEventListener("click", () => {
-          groupEl.classList.toggle("active");
+      }
+
+      // 首次加载页面时执行渲染
+      renderAccordion();
+
+      // 4. 监听中英切换按钮触发的语言改变事件
+      // 这里的全局监听器能动态捕获外部系统对 documentElement.lang 的改动并自动刷新数据
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "attributes" && mutation.attributeName === "lang") {
+            renderAccordion();
+          }
         });
       });
+      observer.observe(document.documentElement, { attributes: true });
     });
   </script>
 </body>
