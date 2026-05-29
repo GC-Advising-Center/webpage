@@ -4,16 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Advisors | GC Advising Center</title>
-  <meta
-    name="description"
-    content="Advisor profiles for the GC Advising Center."
-  >
+  <meta name="description" content="Advisor profiles for the GC Advising Center.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/styles.css">
   
   <style>
@@ -45,6 +39,14 @@
       font-size: 1.25rem;
       color: #0f172a;
       font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .accordion-header h3 .en-title {
+      font-size: 0.95rem;
+      color: #64748b;
+      font-weight: 500;
     }
     .accordion-icon {
       font-size: 1.25rem;
@@ -69,26 +71,56 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
     }
+    
+    /* 双语排版微调 */
+    .bilingual-sep {
+      border-top: 1px dashed #e2e8f0;
+      margin: 0.5rem 0;
+    }
+    .en-text {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    .advisor-card__role {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+    .advisor-card__role .en-role {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
   </style>
 </head>
 <body data-page="advisors">
   <div class="page-shell">
     <header class="topbar panel panel--nav">
-      <a class="brand" href="./index.html"><img class="brand__logo" src="./assets/GCAC.png" alt="GC Advising Center logo"><span class="brand__text" id="brandText"></span></a>
+      <a class="brand" href="./index.html">
+        <img class="brand__logo" src="./assets/GCAC.png" alt="GC Advising Center logo">
+        <span class="brand__text" id="brandText">学业分享中心 / GC Advising Center</span>
+      </a>
       <nav class="site-nav" id="siteNav" aria-label="Primary"></nav>
     </header>
 
     <main class="main-layout">
       <section class="subpage-hero panel">
-        <p class="eyebrow" id="pageKicker"></p>
-        <h1 id="pageTitle"></h1>
-        <p class="hero__description" id="pageDescription"></p>
+        <p class="eyebrow" id="pageKicker">顾问页面 / Advisors</p>
+        <h1 id="pageTitle">Advisor 介绍 / Advisor Profiles</h1>
+        <p class="hero__description" id="pageDescription">
+          欢迎咨询我们的顾问团队。 / Welcome to consult our advisor team.
+        </p>
       </section>
 
       <section class="panel">
         <div class="section-heading">
-          <p class="section-kicker" id="advisorDirectoryKicker"></p>
-          <h2 id="advisorDirectoryTitle"></h2>
+          <p class="section-kicker" id="advisorDirectoryKicker">顾问团队 / People</p>
+          <h2 id="advisorDirectoryTitle">Advisor 名录 / Advisor Directory</h2>
         </div>
         <div id="accordionContainer"></div>
         <div class="advisor-grid" id="advisorList" style="display: none;"></div>
@@ -106,70 +138,75 @@
 
       const container = document.getElementById("accordionContainer");
 
-      // 定义核心渲染函数：根据当前语言环境(zh或en)渲染内容
-      function renderAccordion() {
-        // 1. 获取当前页面的最新语言（检测 html 标签的 lang 属性是否包含 'en'）
-        const isEn = document.documentElement.lang.toLowerCase().includes("en");
-        const lang = isEn ? "en" : "zh";
-        const expertiseLabel = data.advisors.expertiseLabel ? (data.advisors.expertiseLabel[lang] || data.advisors.expertiseLabel["zh"]) : "Best for";
-
-        // 清空容器，准备重新渲染（防止切换语言时内容重叠）
+      function renderBilingualAccordion() {
         container.innerHTML = "";
 
-        // 2. 循环生成 5 个分组
+        // 遍历 5 个大组
         data.advisors.groups.forEach((group) => {
-          const groupTitle = group.title[lang] || group.title["zh"];
+          const titleZh = group.title["zh"] || "";
+          const titleEn = group.title["en"] || "";
           
-          // 创建大类包裹层
           const groupEl = document.createElement("div");
           groupEl.className = "accordion-group";
           
-          // 如果你希望页面刚加载时“教师团队”或“所有组”默认是展开的，可以取消下面这行的注释：
-          // groupEl.className = "accordion-group active";
-          
-          // 创建折叠栏头部
+          // 创建折叠栏头部，同时写入中英文
           const headerEl = document.createElement("button");
           headerEl.className = "accordion-header";
           headerEl.innerHTML = `
-            <h3>${groupTitle} (${group.items.length})</h3>
+            <h3>
+              <span class="zh-title">${titleZh} (${group.items.length})</span>
+              <span class="en-title">${titleEn} (${group.items.length})</span>
+            </h3>
             <span class="accordion-icon">▼</span>
           `;
           
-          // 创建内容容器层与网格
           const contentEl = document.createElement("div");
           contentEl.className = "accordion-content";
           const gridEl = document.createElement("div");
           gridEl.className = "accordion-grid";
           
-          // 3. 内部循环：渲染顾问卡片
+          // 内部循环：渲染每个顾问的卡片
           group.items.forEach(advisor => {
             const name = advisor.name;
-            const role = advisor.role[lang] || advisor.role["zh"];
-            const bio = advisor.bio[lang] || advisor.bio["zh"];
+            const roleZh = advisor.role["zh"] || "";
+            const roleEn = advisor.role["en"] || "";
+            const bioZh = advisor.bio["zh"] || "";
+            const bioEn = advisor.bio["en"] || "";
             const email = advisor.email;
             
-            // 渲染适合咨询的标签（Tags）
+            // 处理适合咨询的标签（中英混合拼接展示）
             let expertiseHtml = "";
             if (advisor.expertise && advisor.expertise.length > 0) {
-              const tags = advisor.expertise.map(exp => `<span class="tag">${exp[lang] || exp["zh"]}</span>`).join("");
+              const tags = advisor.expertise.map(exp => {
+                const expZh = exp["zh"] || "";
+                const expEn = exp["en"] || "";
+                return `<span class="tag" style="font-size:0.8rem; margin-bottom:4px;">${expZh} (${expEn})</span>`;
+              }).join("");
+
               expertiseHtml = `
-                <div class="advisor-card__expertise">
-                  <span class="expertise-label">${expertiseLabel}:</span>
+                <div class="advisor-card__expertise" style="margin-top: 12px;">
+                  <span class="expertise-label" style="font-weight:700; font-size:0.85rem; display:block; margin-bottom:4px;">
+                    适合咨询 / Best for:
+                  </span>
                   <div class="tags-container">${tags}</div>
                 </div>
               `;
             }
 
-            // 完美复用原本 CSS 的卡片组件结构
+            // 构建完美的双语卡片
             const cardEl = document.createElement("div");
             cardEl.className = "advisor-card";
             cardEl.innerHTML = `
               <div class="advisor-card__header">
                 <h4 class="advisor-card__name">${name}</h4>
-                <p class="advisor-card__role">${role}</p>
+                <div class="advisor-card__role">
+                  <span class="zh-role">${roleZh}</span>
+                  <span class="en-role">${roleEn}</span>
+                </div>
               </div>
               <div class="advisor-card__body">
-                <p class="advisor-card__bio">${bio}</p>
+                <p class="advisor-card__bio" style="margin-bottom:0;">${bioZh}</p>
+                <p class="advisor-card__bio en-text" style="margin-top:4px;">${bioEn}</p>
                 ${expertiseHtml}
               </div>
               <div class="advisor-card__footer">
@@ -187,26 +224,15 @@
           groupEl.appendChild(contentEl);
           container.appendChild(groupEl);
           
-          // 绑定点击事件
+          // 绑定手风琴展开/折叠事件
           headerEl.addEventListener("click", () => {
             groupEl.classList.toggle("active");
           });
         });
       }
 
-      // 首次加载页面时执行渲染
-      renderAccordion();
-
-      // 4. 监听中英切换按钮触发的语言改变事件
-      // 这里的全局监听器能动态捕获外部系统对 documentElement.lang 的改动并自动刷新数据
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === "attributes" && mutation.attributeName === "lang") {
-            renderAccordion();
-          }
-        });
-      });
-      observer.observe(document.documentElement, { attributes: true });
+      // 执行纯粹的双语并行渲染
+      renderBilingualAccordion();
     });
   </script>
 </body>
