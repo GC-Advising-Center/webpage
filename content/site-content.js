@@ -217,7 +217,7 @@ window.SITE_CONTENT = {
             ],
             bio: {
               zh: "2年半玄学算命经验，欢迎来算命",
-              en: "2.5 years of fortune-telling experience — come get your future read.",
+              en: "2.5 years of fortune-telling e/xperience — come get your future read.",
             },
           },
           {
@@ -656,10 +656,6 @@ window.SITE_CONTENT = {
     ],
   }, 
   piazza: {
-    description: {
-      zh: "Piazza 适合发布公告、整理可复用的问题解答，以及保留对整个课程社区都有帮助的讨论串。",
-      en: "Use Piazza for announcements, reusable questions, and discussion threads that should stay visible to the whole course community.",
-    },
     links: [
       {
         label: { zh: "打开 Piazza", en: "Open Piazza" },
@@ -667,33 +663,13 @@ window.SITE_CONTENT = {
         external: true,
         variant: "primary",
       },
-      {
-        label: { zh: "在数据文件中编辑 Piazza 说明", en: "Edit Piazza Notes In Data File" },
-        href: "./content/site-content.js",
-        external: false,
-        variant: "ghost",
-      },
     ],
     notes: [
       {
-        title: { zh: "适合发在 Piazza 的内容", en: "What belongs on Piazza" },
+        title: { zh: "Piazza 的内容", en: "What belongs on Piazza" },
         body: {
           zh: "适合发布那些答案可复用的问题、对资料的澄清，以及所有人都应该看到的公告。",
           en: "Use it for questions with reusable answers, clarifications on materials, and announcements that everyone should see.",
-        },
-      },
-      {
-        title: { zh: "建议的回复策略", en: "Suggested response policy" },
-        body: {
-          zh: "在条件允许的情况下尽量在一个工作日内回复；涉及隐私或个人问题时，建议转为邮件沟通。",
-          en: "Reply within one business day when possible, and move sensitive or personal issues to email instead of public threads.",
-        },
-      },
-      {
-        title: { zh: "后续可能的自动化方案", en: "Possible future automation" },
-        body: {
-          zh: "如果以后你想在这里展示最新帖子，一个可行方案是用 serverless function 或人工审核后的导出数据来驱动这个页面。",
-          en: "If you later want recent posts here, a practical option is to feed this page with a serverless function or manually reviewed export data.",
         },
       },
     ],
