@@ -629,10 +629,6 @@ window.SITE_CONTENT = {
       zh: "Piazza 适合发布公告、整理可复用的问题解答，以及保留对整个课程社区都有帮助的讨论串。",
       en: "Use Piazza for announcements, reusable questions, and discussion threads that should stay visible to the whole course community.",
     },
-    integrationNote: {
-      zh: "这个静态网站目前没有直接接入 Piazza 的实时内容。如果以后你想自动同步更新，通常需要单独的后端服务或人工整理的 JSON 导出源。",
-      en: "A live Piazza feed is not wired into this static site. If you want automatic updates later, the usual next step is a separate backend or a curated JSON export source.",
-    },
     links: [
       {
         label: { zh: "打开 Piazza", en: "Open Piazza" },
