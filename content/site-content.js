@@ -614,7 +614,7 @@ window.SITE_CONTENT = {
   },
   dutySchedule: {
     intro: {
-      zh: "每周一到周四晚间值班，地点龙斌楼312。单双周人员不同，同一天同时有三位顾问在场。",
+      zh: "每周一到周四晚间值班，地点龙宾楼312。单双周人员不同，同一天同时有三位顾问在场。",
       en: "Duty runs Monday to Thursday evenings at LB312. Odd and even weeks have different advisors; three advisors are on duty each day.",
     },
     columns: [
@@ -643,7 +643,7 @@ window.SITE_CONTENT = {
         { zh: "周三", en: "Wednesday" },
         "7:00-9:00 PM",
         "王一敏 / 班雨桐 / 汤礼维",
-        "叶承嵘",
+        "叶承嵘 / 班雨桐",
         "龙宾楼 312",
       ],
       [
