@@ -1,29 +1,96 @@
-// 1. 初始化语言状态（优先读取本地缓存，默认中文）
-if (!localStorage.getItem('SITE_LANG')) {
-  localStorage.setItem('SITE_LANG', 'zh');
-}
+const SITE_LANG_KEY = "SITE_LANG";
+const DEFAULT_SITE_LANG = "zh";
+const SUPPORTED_SITE_LANGUAGES = new Set(["zh", "en"]);
 
-// 2. 提供一个全局切换语言的方法，供前端按钮调用
-window.toggleSiteLanguage = function() {
-  const currentLang = localStorage.getItem('SITE_LANG') === 'zh' ? 'en' : 'zh';
-  localStorage.setItem('SITE_LANG', currentLang);
-  window.location.reload(); // 刷新页面应用新语言
+const readStoredLanguage = () => {
+  try {
+    return localStorage.getItem(SITE_LANG_KEY);
+  } catch {
+    return null;
+  }
 };
 
-// 3. 辅助函数：根据当前语言动态返回文本
-function t(localizedObj) {
-  if (!localizedObj) return "";
-  // 如果不是对象或者没有对应语言，做兜底处理
-  if (typeof localizedObj !== 'object') return localizedObj;
-  const lang = localStorage.getItem('SITE_LANG') || 'zh';
-  return localizedObj[lang] !== undefined ? localizedObj[lang] : localizedObj['zh'];
+const writeStoredLanguage = (lang) => {
+  try {
+    localStorage.setItem(SITE_LANG_KEY, lang);
+  } catch {
+    // Ignore storage failures and keep working with the in-memory value.
+  }
+};
+
+const normalizeLanguage = (lang) => (
+  SUPPORTED_SITE_LANGUAGES.has(lang) ? lang : DEFAULT_SITE_LANG
+);
+
+const getCurrentSiteLanguage = () => normalizeLanguage(readStoredLanguage());
+
+const applyDocumentLanguage = () => {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  document.documentElement.lang = getCurrentSiteLanguage() === "zh" ? "zh-CN" : "en";
+};
+
+if (!readStoredLanguage()) {
+  writeStoredLanguage(DEFAULT_SITE_LANG);
 }
 
-// 4. 定义数据源（保持原汁原味的数据）
+applyDocumentLanguage();
+
+function t(localizedObj) {
+  if (!localizedObj) {
+    return "";
+  }
+
+  if (typeof localizedObj !== "object") {
+    return localizedObj;
+  }
+
+  const lang = getCurrentSiteLanguage();
+  return localizedObj[lang] !== undefined ? localizedObj[lang] : localizedObj.zh;
+}
+
+window.SITE_LANGUAGE = {
+  key: SITE_LANG_KEY,
+  defaultLanguage: DEFAULT_SITE_LANG,
+  getCurrentLanguage: getCurrentSiteLanguage,
+  setCurrentLanguage(lang) {
+    const previousLang = getCurrentSiteLanguage();
+    const nextLang = normalizeLanguage(lang);
+    writeStoredLanguage(nextLang);
+    applyDocumentLanguage();
+    if (typeof window !== "undefined" && previousLang !== nextLang) {
+      window.dispatchEvent(new CustomEvent("site-language-change", {
+        detail: { language: nextLang },
+      }));
+    }
+    return nextLang;
+  },
+  toggleLanguage() {
+    return this.setCurrentLanguage(getCurrentSiteLanguage() === "zh" ? "en" : "zh");
+  },
+  translate: t,
+  isLocalizedValue(value) {
+    return Boolean(value && typeof value === "object" && "zh" in value && "en" in value);
+  },
+};
+
+window.toggleSiteLanguage = function toggleSiteLanguage() {
+  return window.SITE_LANGUAGE.toggleLanguage();
+};
+
 window.SITE_CONTENT = {
+  get languageToggle() {
+    const currentLang = getCurrentSiteLanguage();
+    return {
+      label: currentLang === "zh" ? "English" : "中文",
+      ariaLabel: currentLang === "zh" ? "Switch to English" : "切换到中文",
+    };
+  },
   get brand() {
     return {
-      text: t({ zh: "学业分享中心", en: "GC Advising Center" })
+      text: t({ zh: "学业分享中心", en: "GC Advising Center" }),
     };
   },
   get site() {
@@ -58,7 +125,7 @@ window.SITE_CONTENT = {
       {
         kicker: t({ zh: "值班安排", en: "Duty Schedule" }),
         title: t({ zh: "本周值班信息", en: "Weekly Duty Info" }),
-        body: t({ zh: "查看周一到周五晚间值班安排和地点。", en: "See the weekday evening schedule and locations." }),
+        body: t({ zh: "查看周一到周四晚间值班安排和地点。", en: "See the Monday-to-Thursday evening schedule and locations." }),
         cta: t({ zh: "打开值班页", en: "Open Schedule" }),
         href: "./schedule.html",
       },
@@ -76,24 +143,40 @@ window.SITE_CONTENT = {
       materials: {
         kicker: t({ zh: "资料页面", en: "Materials" }),
         title: t({ zh: "往期工作坊资料", en: "Past Workshop Materials" }),
+        description: t({
+          zh: "查看 workshop 往期资料、分享回放和归档链接。",
+          en: "Browse workshop archives, recordings, and related resource links.",
+        }),
         sectionKicker: t({ zh: "完整归档", en: "Archive" }),
         sectionTitle: t({ zh: "全部工作坊资料", en: "All Workshop Materials" }),
       },
       advisors: {
         kicker: t({ zh: "顾问页面", en: "Advisors" }),
         title: t({ zh: "Advisor 介绍", en: "Advisor Profiles" }),
+        description: t({
+          zh: "按年级和方向查找顾问，按需联系合适的同学或老师。",
+          en: "Find advisors by year and focus area, then reach out to the right person directly.",
+        }),
         sectionKicker: t({ zh: "顾问团队", en: "People" }),
         sectionTitle: t({ zh: "Advisor 名录", en: "Advisor Directory" }),
       },
       schedule: {
         kicker: t({ zh: "值班安排", en: "Duty Schedule" }),
         title: t({ zh: "工作日晚间值班", en: "Weekday Evening Coverage" }),
+        description: t({
+          zh: "查看每周晚间值班时间、地点和单双周顾问安排。",
+          en: "Check the evening duty schedule, location, and odd/even-week advisor assignments.",
+        }),
         sectionKicker: t({ zh: "值班覆盖", en: "Coverage" }),
-        sectionTitle: t({ zh: "周一到周五晚间值班表", en: "Monday To Friday Evening Schedule" }),
+        sectionTitle: t({ zh: "周一到周四晚间值班表", en: "Monday To Thursday Evening Schedule" }),
       },
       piazza: {
         kicker: t({ zh: "Piazza", en: "Piazza" }),
         title: t({ zh: "讨论区入口", en: "Discussion Board Access" }),
+        description: t({
+          zh: "进入 Piazza 讨论区，查看公开问答、资料澄清和课程公告。",
+          en: "Open Piazza for shared Q&A, clarifications on materials, and course announcements.",
+        }),
         sectionKicker: t({ zh: "社区讨论", en: "Community" }),
         sectionTitle: t({ zh: "Piazza 入口与说明", en: "Piazza Access And Notes" }),
       },
@@ -333,7 +416,6 @@ window.SITE_CONTENT = {
               bio: t({ zh: "天马行空的人类观察员", en: "An imaginative human observer." }),
             },
             {
-              name: "LIU乐思", // 修正原文本中可能的小瑕疵
               name: "刘乐思",
               role: t({ zh: "大二 ECE 专业", en: "Sophomore, ECE" }),
               email: "alan-lls@sjtu.edu.cn",
@@ -454,6 +536,14 @@ window.SITE_CONTENT = {
   },
   get piazza() {
     return {
+      description: t({
+        zh: "建议将可复用的问题和公开通知发到 Piazza，方便大家统一查看和检索。",
+        en: "Use Piazza for reusable questions and shared announcements so everyone can read and search them later.",
+      }),
+      integrationNote: t({
+        zh: "如果问题只和个人安排有关，再单独邮件联系相关顾问。",
+        en: "If your question is only about a personal situation, email the relevant advisor directly instead.",
+      }),
       links: [
         {
           label: t({ zh: "打开 Piazza", en: "Open Piazza" }),

@@ -1,12 +1,17 @@
 const siteContent = window.SITE_CONTENT;
+const siteLanguage = window.SITE_LANGUAGE;
 
 if (!siteContent) {
   throw new Error("SITE_CONTENT is missing. Check content/site-content.js.");
 }
 
+if (!siteLanguage) {
+  throw new Error("SITE_LANGUAGE is missing. Check content/site-content.js.");
+}
+
 const pageType = document.body.dataset.page || "home";
-const isBilingual = (value) => value && typeof value === "object" && "zh" in value && "en" in value;
 let materialsCache = null;
+const openAdvisorGroups = new Set();
 
 const RESOURCE_LABELS = {
   "预告推送": { zh: "预告推送", en: "Preview Post" },
@@ -25,50 +30,50 @@ const TITLE_FALLBACKS = {
   },
 };
 
+const isLocalizedValue = (value) => siteLanguage.isLocalizedValue(value);
+
+const resolveText = (value) => {
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  if (isLocalizedValue(value)) {
+    const lang = siteLanguage.getCurrentLanguage();
+    return value[lang] ?? value.zh ?? value.en ?? "";
+  }
+
+  return value;
+};
+
 const createElement = (tag, className, text) => {
   const element = document.createElement(tag);
   if (className) {
     element.className = className;
   }
-  if (text !== undefined && text !== null && !isBilingual(text)) {
-    element.textContent = text;
+  if (text !== undefined && text !== null) {
+    element.textContent = resolveText(text);
   }
   return element;
 };
 
 const getById = (id) => document.getElementById(id);
 
-const fillText = (element, value, options = {}) => {
+const fillText = (element, value) => {
   if (!element) {
     return;
   }
 
-  const { inline = false } = options;
-  element.textContent = "";
-
-  if (isBilingual(value)) {
-    const wrapper = createElement("span", inline ? "bilingual bilingual--inline" : "bilingual");
-    wrapper.append(
-      createElement("span", "bilingual__zh", value.zh),
-      createElement("span", "bilingual__en", value.en),
-    );
-    element.append(wrapper);
-    return;
-  }
-
-  if (value !== undefined && value !== null) {
-    element.textContent = value;
-  }
+  element.textContent = resolveText(value);
 };
 
-const createContentElement = (tag, className, value, options = {}) => {
+const createContentElement = (tag, className, value) => {
   const element = createElement(tag, className);
-  fillText(element, value, options);
+  fillText(element, value);
   return element;
 };
 
-const setText = (id, value, options = {}) => {
-  fillText(getById(id), value, options);
+const setText = (id, value) => {
+  fillText(getById(id), value);
 };
 
 const getResourceLabel = (label) => RESOURCE_LABELS[label] || { zh: label, en: label };
@@ -201,12 +206,44 @@ const renderNav = () => {
     return;
   }
 
+  nav.textContent = "";
   siteContent.navigation.forEach((item) => {
     const link = createElement("a", item.id === pageType ? "nav-link nav-link--active" : "nav-link");
     link.href = item.href;
-    fillText(link, item.label, { inline: true });
+    fillText(link, item.label);
     nav.append(link);
   });
+};
+
+const renderLanguageToggle = () => {
+  const toggle = getById("langToggle");
+  if (!toggle) {
+    return;
+  }
+
+  const toggleContent = siteContent.languageToggle;
+  fillText(toggle, toggleContent.label);
+  toggle.setAttribute("aria-label", toggleContent.ariaLabel);
+  toggle.onclick = () => {
+    siteLanguage.toggleLanguage();
+  };
+};
+
+const renderDocumentMetadata = () => {
+  const brandText = resolveText(siteContent.brand.text);
+  const pageContent = siteContent.pages[pageType];
+  const title = pageType === "home"
+    ? brandText
+    : `${resolveText(pageContent?.title || brandText)} | ${brandText}`;
+  const description = pageType === "home"
+    ? resolveText(siteContent.site.description)
+    : resolveText(pageContent?.description || siteContent.site.description);
+
+  document.title = title;
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  if (descriptionMeta) {
+    descriptionMeta.setAttribute("content", description);
+  }
 };
 
 const renderMaterialCards = (items, targetId, limit) => {
@@ -232,7 +269,7 @@ const renderMaterialCards = (items, targetId, limit) => {
       anchor.href = entry.href;
       anchor.target = entry.external ? "_blank" : "_self";
       anchor.rel = entry.external ? "noreferrer" : "";
-      fillText(anchor, entry.label, { inline: true });
+      fillText(anchor, entry.label);
       links.append(anchor);
     });
 
@@ -256,34 +293,83 @@ const renderMaterialsError = (targetId) => {
   container.append(card);
 };
 
-const renderAdvisorCards = (targetId, limit) => {
-  const container = getById(targetId);
+const renderAdvisorAccordion = () => {
+  const container = getById("accordionContainer");
   if (!container) {
     return;
   }
 
   container.textContent = "";
-  const visibleItems = typeof limit === "number" ? siteContent.advisors.items.slice(0, limit) : siteContent.advisors.items;
 
-  visibleItems.forEach((item) => {
-    const card = createElement("article", "card advisor-card fade-in");
-    const titleRow = createElement("div", "card__title-row");
-    titleRow.append(
-      createElement("h3", "card__title", item.name),
-      createContentElement("span", "pill", item.role, { inline: true }),
+  siteContent.advisors.groups.forEach((group, index) => {
+    const defaultExpanded = openAdvisorGroups.size === 0 && index === 0;
+    const isExpanded = openAdvisorGroups.has(group.id) || defaultExpanded;
+
+    if (defaultExpanded) {
+      openAdvisorGroups.add(group.id);
+    }
+
+    const groupEl = createElement("section", `accordion-group${isExpanded ? " active" : ""}`);
+    const headerEl = createElement("button", "accordion-header");
+    headerEl.type = "button";
+    headerEl.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+
+    const title = createElement("h3", "accordion-title");
+    title.append(
+      createContentElement("span", "accordion-title__text", group.title),
+      createElement("span", "accordion-title__count", group.items.length),
     );
 
-    const email = createElement("a", "text-link", item.email);
-    email.href = `mailto:${item.email}`;
+    const icon = createElement("span", "accordion-icon", "▼");
+    icon.setAttribute("aria-hidden", "true");
+    headerEl.append(title, icon);
 
-    const expertiseTitle = createContentElement("p", "detail-label", siteContent.advisors.expertiseLabel, { inline: true });
-    const expertiseList = createElement("ul", "tag-list");
-    item.expertise.forEach((entry) => {
-      expertiseList.append(createContentElement("li", "", entry, { inline: true }));
+    const contentEl = createElement("div", "accordion-content");
+    const gridEl = createElement("div", "accordion-grid");
+
+    group.items.forEach((item) => {
+      const card = createElement("article", "card advisor-card fade-in");
+      const titleRow = createElement("div", "card__title-row");
+      titleRow.append(
+        createElement("h3", "card__title", item.name),
+        createElement("span", "pill", item.role),
+      );
+
+      const email = createElement("a", "advisor-card__email text-link", item.email);
+      email.href = `mailto:${item.email}`;
+
+      const expertiseTitle = createContentElement("p", "detail-label", siteContent.advisors.expertiseLabel);
+      const expertiseList = createElement("ul", "tag-list");
+      item.expertise.forEach((entry) => {
+        expertiseList.append(createContentElement("li", "", entry));
+      });
+
+      card.append(
+        titleRow,
+        createContentElement("p", "card__body", item.bio),
+        expertiseTitle,
+        expertiseList,
+        email,
+      );
+
+      gridEl.append(card);
     });
 
-    card.append(titleRow, email, expertiseTitle, expertiseList, createContentElement("p", "card__body", item.bio));
-    container.append(card);
+    contentEl.append(gridEl);
+    groupEl.append(headerEl, contentEl);
+    container.append(groupEl);
+
+    headerEl.addEventListener("click", () => {
+      const nextExpanded = !groupEl.classList.contains("active");
+      groupEl.classList.toggle("active", nextExpanded);
+      headerEl.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+
+      if (nextExpanded) {
+        openAdvisorGroups.add(group.id);
+      } else {
+        openAdvisorGroups.delete(group.id);
+      }
+    });
   });
 };
 
@@ -299,7 +385,7 @@ const renderSchedule = () => {
   const thead = createElement("thead");
   const headRow = createElement("tr");
   siteContent.dutySchedule.columns.forEach((column) => {
-    headRow.append(createContentElement("th", "", column, { inline: true }));
+    headRow.append(createContentElement("th", "", column));
   });
   thead.append(headRow);
 
@@ -307,7 +393,7 @@ const renderSchedule = () => {
   siteContent.dutySchedule.rows.forEach((row) => {
     const tr = createElement("tr");
     row.forEach((value) => {
-      tr.append(createContentElement("td", "", value, { inline: true }));
+      tr.append(createContentElement("td", "", value));
     });
     tbody.append(tr);
   });
@@ -322,6 +408,10 @@ const renderPiazza = () => {
   if (!summary || !links || !notes) {
     return;
   }
+
+  summary.textContent = "";
+  links.textContent = "";
+  notes.textContent = "";
 
   summary.append(
     createContentElement("p", "card__body", siteContent.piazza.description),
@@ -339,7 +429,10 @@ const renderPiazza = () => {
 
   siteContent.piazza.notes.forEach((item) => {
     const note = createElement("article", "card note-card fade-in");
-    note.append(createContentElement("h3", "card__title", item.title), createContentElement("p", "card__body", item.body));
+    note.append(
+      createContentElement("h3", "card__title", item.title),
+      createContentElement("p", "card__body", item.body),
+    );
     notes.append(note);
   });
 };
@@ -350,7 +443,7 @@ const renderPageHero = () => {
     return;
   }
 
-  setText("pageKicker", pageContent.kicker, { inline: true });
+  setText("pageKicker", pageContent.kicker);
   setText("pageTitle", pageContent.title);
   setText("pageDescription", pageContent.description);
 };
@@ -367,16 +460,17 @@ const renderHomeEntryCards = () => {
     const card = createElement("a", "overview-card fade-in");
     card.href = item.href;
     card.append(
-      createContentElement("p", "meta-label", item.kicker, { inline: true }),
+      createContentElement("p", "meta-label", item.kicker),
       createContentElement("h2", "card__title", item.title),
-      createContentElement("p", "quick-link__arrow", item.cta, { inline: true }),
+      createContentElement("p", "card__body", item.body),
+      createContentElement("p", "quick-link__arrow", item.cta),
     );
     container.append(card);
   });
 };
 
 const renderHome = () => {
-  setText("siteTagline", siteContent.site.tagline, { inline: true });
+  setText("siteTagline", siteContent.site.tagline);
   setText("siteTitle", siteContent.site.title);
   setText("siteDescription", siteContent.site.description);
   renderHomeEntryCards();
@@ -384,7 +478,7 @@ const renderHome = () => {
 
 const renderMaterialsPage = async () => {
   renderPageHero();
-  setText("materialsArchiveKicker", siteContent.pages.materials.sectionKicker, { inline: true });
+  setText("materialsArchiveKicker", siteContent.pages.materials.sectionKicker);
   setText("materialsArchiveTitle", siteContent.pages.materials.sectionTitle);
 
   try {
@@ -398,41 +492,60 @@ const renderMaterialsPage = async () => {
 
 const renderAdvisorsPage = () => {
   renderPageHero();
-  setText("advisorDirectoryKicker", siteContent.pages.advisors.sectionKicker, { inline: true });
+  setText("advisorDirectoryKicker", siteContent.pages.advisors.sectionKicker);
   setText("advisorDirectoryTitle", siteContent.pages.advisors.sectionTitle);
-  renderAdvisorCards("advisorList");
+  renderAdvisorAccordion();
 };
 
 const renderSchedulePage = () => {
   renderPageHero();
-  setText("scheduleTableKicker", siteContent.pages.schedule.sectionKicker, { inline: true });
+  setText("scheduleTableKicker", siteContent.pages.schedule.sectionKicker);
   setText("scheduleTableTitle", siteContent.pages.schedule.sectionTitle);
   renderSchedule();
 };
 
 const renderPiazzaPage = () => {
   renderPageHero();
-  setText("piazzaSectionKicker", siteContent.pages.piazza.sectionKicker, { inline: true });
+  setText("piazzaSectionKicker", siteContent.pages.piazza.sectionKicker);
   setText("piazzaSectionTitle", siteContent.pages.piazza.sectionTitle);
   renderPiazza();
 };
 
-const init = async () => {
+const renderPage = async () => {
+  renderDocumentMetadata();
   renderBrand();
   renderNav();
+  renderLanguageToggle();
 
   if (pageType === "materials") {
     await renderMaterialsPage();
-  } else if (pageType === "advisors") {
-    renderAdvisorsPage();
-  } else if (pageType === "schedule") {
-    renderSchedulePage();
-  } else if (pageType === "piazza") {
-    renderPiazzaPage();
-  } else {
-    renderHome();
+    return;
   }
+
+  if (pageType === "advisors") {
+    renderAdvisorsPage();
+    return;
+  }
+
+  if (pageType === "schedule") {
+    renderSchedulePage();
+    return;
+  }
+
+  if (pageType === "piazza") {
+    renderPiazzaPage();
+    return;
+  }
+
+  renderHome();
 };
 
-init();
+renderPage().catch((error) => {
+  console.error(error);
+});
 
+window.addEventListener("site-language-change", () => {
+  renderPage().catch((error) => {
+    console.error(error);
+  });
+});

@@ -152,6 +152,13 @@ body::after {
   gap: 0.65rem;
 }
 
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
 .nav-link {
   padding: 0.6rem 0.96rem;
   border-radius: 999px;
@@ -171,6 +178,29 @@ body::after {
 .nav-link--active {
   color: #fdfefe;
   background: linear-gradient(135deg, var(--highlight), var(--highlight-strong));
+}
+
+.lang-toggle {
+  appearance: none;
+  border: 1px solid rgba(11, 58, 130, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--highlight);
+  border-radius: 999px;
+  padding: 0.62rem 1rem;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.lang-toggle:hover,
+.lang-toggle:focus-visible {
+  transform: translateY(-1px);
+  background: #ffffff;
+  border-color: rgba(11, 58, 130, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(29, 91, 191, 0.08);
 }
 
 .nav-link .bilingual {
@@ -444,8 +474,94 @@ body::after {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
+.accordion-group {
+  margin-bottom: 1rem;
+  border: 1px solid rgba(10, 44, 96, 0.08);
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--surface-strong);
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.25rem;
+  border: 0;
+  background: rgba(29, 91, 191, 0.04);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.accordion-header:hover,
+.accordion-header:focus-visible {
+  background: rgba(29, 91, 191, 0.08);
+}
+
+.accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: 1.1rem;
+}
+
+.accordion-title__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  height: 1.8rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgba(11, 58, 130, 0.08);
+  color: var(--highlight);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.accordion-icon {
+  color: var(--muted);
+  transition: transform 160ms ease;
+}
+
+.accordion-group.active .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  display: none;
+  padding: 1.25rem;
+}
+
+.accordion-group.active .accordion-content {
+  display: block;
+}
+
+.accordion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
 .card {
   padding: 1.1rem;
+}
+
+.advisor-card {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.advisor-card__email {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
 }
 
 .card__title-row {
@@ -613,6 +729,13 @@ body::after {
     flex-direction: column;
   }
 
+  .topbar__actions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+    margin-left: 0;
+  }
+
   .site-nav {
     justify-content: flex-start;
   }
@@ -644,6 +767,15 @@ body::after {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .topbar__actions,
+  .site-nav {
+    width: 100%;
+  }
+
+  .lang-toggle {
+    width: 100%;
   }
 
   .brand__logo {

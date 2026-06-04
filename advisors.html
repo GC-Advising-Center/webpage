@@ -10,230 +10,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/styles.css">
   
-  <style>
-    .accordion-group {
-      margin-bottom: 1.5rem;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .accordion-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 1.5rem;
-      background: rgba(0, 0, 0, 0.02);
-      border: none;
-      cursor: pointer;
-      text-align: left;
-      outline: none;
-      transition: background 0.2s ease;
-    }
-    .accordion-header:hover {
-      background: rgba(0, 0, 0, 0.04);
-    }
-    .accordion-header h3 {
-      margin: 0;
-      font-size: 1.25rem;
-      color: #0f172a;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .accordion-header h3 .en-title {
-      font-size: 0.95rem;
-      color: #64748b;
-      font-weight: 500;
-    }
-    .accordion-icon {
-      font-size: 1.25rem;
-      transition: transform 0.2s ease;
-      color: #64748b;
-    }
-    .accordion-group.active .accordion-icon {
-      transform: rotate(180deg);
-    }
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      padding: 0 1.5rem;
-    }
-    .accordion-group.active .accordion-content {
-      max-height: 5000px;
-      padding: 1.5rem;
-    }
-    .accordion-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-    
-    /* 双语排版微调 */
-    .bilingual-sep {
-      border-top: 1px dashed #e2e8f0;
-      margin: 0.5rem 0;
-    }
-    .en-text {
-      color: #64748b;
-      font-size: 0.9rem;
-      margin-top: 0.25rem;
-    }
-    .advisor-card__role {
-      display: flex;
-      flex-direction: column;
-      gap: 0.125rem;
-    }
-    .advisor-card__role .en-role {
-      font-size: 0.8rem;
-      color: #64748b;
-    }
-    .tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-    }
-  </style>
 </head>
 <body data-page="advisors">
   <div class="page-shell">
     <header class="topbar panel panel--nav">
       <a class="brand" href="./index.html">
         <img class="brand__logo" src="./assets/GCAC.png" alt="GC Advising Center logo">
-        <span class="brand__text" id="brandText">学业分享中心 / GC Advising Center</span>
+        <span class="brand__text" id="brandText"></span>
       </a>
-      <nav class="site-nav" id="siteNav" aria-label="Primary"></nav>
+      <div class="topbar__actions">
+        <nav class="site-nav" id="siteNav" aria-label="Primary"></nav>
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language"></button>
+      </div>
     </header>
 
     <main class="main-layout">
       <section class="subpage-hero panel">
-        <p class="eyebrow" id="pageKicker">顾问页面 / Advisors</p>
-        <h1 id="pageTitle">Advisor 介绍 / Advisor Profiles</h1>
-        <p class="hero__description" id="pageDescription">
-          欢迎咨询我们的顾问团队。 / Welcome to consult our advisor team.
-        </p>
+        <p class="eyebrow" id="pageKicker"></p>
+        <h1 id="pageTitle"></h1>
+        <p class="hero__description" id="pageDescription"></p>
       </section>
 
       <section class="panel">
         <div class="section-heading">
-          <p class="section-kicker" id="advisorDirectoryKicker">顾问团队 / People</p>
-          <h2 id="advisorDirectoryTitle">Advisor 名录 / Advisor Directory</h2>
+          <p class="section-kicker" id="advisorDirectoryKicker"></p>
+          <h2 id="advisorDirectoryTitle"></h2>
         </div>
         <div id="accordionContainer"></div>
-        <div class="advisor-grid" id="advisorList" style="display: none;"></div>
       </section>
     </main>
   </div>
 
   <script src="./content/site-content.js"></script>
   <script src="./assets/app.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const data = window.SITE_CONTENT;
-      if (!data || !data.advisors || !data.advisors.groups) return;
-
-      const container = document.getElementById("accordionContainer");
-
-      function renderBilingualAccordion() {
-        container.innerHTML = "";
-
-        // 遍历 5 个大组
-        data.advisors.groups.forEach((group) => {
-          const titleZh = group.title["zh"] || "";
-          const titleEn = group.title["en"] || "";
-          
-          const groupEl = document.createElement("div");
-          groupEl.className = "accordion-group";
-          
-          // 创建折叠栏头部，同时写入中英文
-          const headerEl = document.createElement("button");
-          headerEl.className = "accordion-header";
-          headerEl.innerHTML = `
-            <h3>
-              <span class="zh-title">${titleZh} (${group.items.length})</span>
-              <span class="en-title">${titleEn} (${group.items.length})</span>
-            </h3>
-            <span class="accordion-icon">▼</span>
-          `;
-          
-          const contentEl = document.createElement("div");
-          contentEl.className = "accordion-content";
-          const gridEl = document.createElement("div");
-          gridEl.className = "accordion-grid";
-          
-          // 内部循环：渲染每个顾问的卡片
-          group.items.forEach(advisor => {
-            const name = advisor.name;
-            const roleZh = advisor.role["zh"] || "";
-            const roleEn = advisor.role["en"] || "";
-            const bioZh = advisor.bio["zh"] || "";
-            const bioEn = advisor.bio["en"] || "";
-            const email = advisor.email;
-            
-            // 处理适合咨询的标签（中英混合拼接展示）
-            let expertiseHtml = "";
-            if (advisor.expertise && advisor.expertise.length > 0) {
-              const tags = advisor.expertise.map(exp => {
-                const expZh = exp["zh"] || "";
-                const expEn = exp["en"] || "";
-                return `<span class="tag" style="font-size:0.8rem; margin-bottom:4px;">${expZh} (${expEn})</span>`;
-              }).join("");
-
-              expertiseHtml = `
-                <div class="advisor-card__expertise" style="margin-top: 12px;">
-                  <span class="expertise-label" style="font-weight:700; font-size:0.85rem; display:block; margin-bottom:4px;">
-                    适合咨询 / Best for:
-                  </span>
-                  <div class="tags-container">${tags}</div>
-                </div>
-              `;
-            }
-
-            // 构建完美的双语卡片
-            const cardEl = document.createElement("div");
-            cardEl.className = "advisor-card";
-            cardEl.innerHTML = `
-              <div class="advisor-card__header">
-                <h4 class="advisor-card__name">${name}</h4>
-                <div class="advisor-card__role">
-                  <span class="zh-role">${roleZh}</span>
-                  <span class="en-role">${roleEn}</span>
-                </div>
-              </div>
-              <div class="advisor-card__body">
-                <p class="advisor-card__bio" style="margin-bottom:0;">${bioZh}</p>
-                <p class="advisor-card__bio en-text" style="margin-top:4px;">${bioEn}</p>
-                ${expertiseHtml}
-              </div>
-              <div class="advisor-card__footer">
-                <a href="mailto:${email}" class="advisor-card__email">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:middle;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                  ${email}
-                </a>
-              </div>
-            `;
-            gridEl.appendChild(cardEl);
-          });
-          
-          contentEl.appendChild(gridEl);
-          groupEl.appendChild(headerEl);
-          groupEl.appendChild(contentEl);
-          container.appendChild(groupEl);
-          
-          // 绑定手风琴展开/折叠事件
-          headerEl.addEventListener("click", () => {
-            groupEl.classList.toggle("active");
-          });
-        });
-      }
-
-      // 执行纯粹的双语并行渲染
-      renderBilingualAccordion();
-    });
-  </script>
 </body>
 </html>
