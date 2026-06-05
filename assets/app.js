@@ -63,7 +63,15 @@ const fillText = (element, value) => {
     return;
   }
 
-  element.textContent = resolveText(value);
+  const text = resolveText(value);
+  element.textContent = text;
+
+  if (text) {
+    element.hidden = false;
+    return;
+  }
+
+  element.hidden = true;
 };
 
 const createContentElement = (tag, className, value) => {
@@ -74,6 +82,16 @@ const createContentElement = (tag, className, value) => {
 
 const setText = (id, value) => {
   fillText(getById(id), value);
+};
+
+const toggleParentHidden = (id, ...values) => {
+  const element = getById(id);
+  if (!element || !element.parentElement) {
+    return;
+  }
+
+  const hasContent = values.some((value) => Boolean(resolveText(value)));
+  element.parentElement.hidden = !hasContent;
 };
 
 const getResourceLabel = (label) => RESOURCE_LABELS[label] || { zh: label, en: label };
@@ -480,6 +498,11 @@ const renderMaterialsPage = async () => {
   renderPageHero();
   setText("materialsArchiveKicker", siteContent.pages.materials.sectionKicker);
   setText("materialsArchiveTitle", siteContent.pages.materials.sectionTitle);
+  toggleParentHidden(
+    "materialsArchiveTitle",
+    siteContent.pages.materials.sectionKicker,
+    siteContent.pages.materials.sectionTitle,
+  );
 
   try {
     const items = await loadMaterials();
@@ -494,6 +517,11 @@ const renderAdvisorsPage = () => {
   renderPageHero();
   setText("advisorDirectoryKicker", siteContent.pages.advisors.sectionKicker);
   setText("advisorDirectoryTitle", siteContent.pages.advisors.sectionTitle);
+  toggleParentHidden(
+    "advisorDirectoryTitle",
+    siteContent.pages.advisors.sectionKicker,
+    siteContent.pages.advisors.sectionTitle,
+  );
   renderAdvisorAccordion();
 };
 
@@ -501,6 +529,11 @@ const renderSchedulePage = () => {
   renderPageHero();
   setText("scheduleTableKicker", siteContent.pages.schedule.sectionKicker);
   setText("scheduleTableTitle", siteContent.pages.schedule.sectionTitle);
+  toggleParentHidden(
+    "scheduleTableTitle",
+    siteContent.pages.schedule.sectionKicker,
+    siteContent.pages.schedule.sectionTitle,
+  );
   renderSchedule();
 };
 
@@ -508,6 +541,11 @@ const renderPiazzaPage = () => {
   renderPageHero();
   setText("piazzaSectionKicker", siteContent.pages.piazza.sectionKicker);
   setText("piazzaSectionTitle", siteContent.pages.piazza.sectionTitle);
+  toggleParentHidden(
+    "piazzaSectionTitle",
+    siteContent.pages.piazza.sectionKicker,
+    siteContent.pages.piazza.sectionTitle,
+  );
   renderPiazza();
 };
 

@@ -95,11 +95,11 @@ window.SITE_CONTENT = {
   },
   get site() {
     return {
-      tagline: t({ zh: "学业分享中心", en: "GC Advising Center" }),
+      tagline: "",
       title: t({ zh: "学业分享中心", en: "Academic Sharing Center" }),
       description: t({
-        zh: "学业分享中心为同学提供学业交流与信息支持，包括 workshop 往期存档、值班安排和 Piazza 讨论区入口，方便大家快速找到需要的资源。",
-        en: "The Academic Sharing Center provides students with academic support resources, including workshop archives, the duty schedule, and Piazza access, so it is easy to find the help you need."
+        zh: "学业分享中心为同学提供学业交流与信息支持。",
+        en: "The Academic Sharing Center provides academic support resources for students."
       })
     };
   },
@@ -109,30 +109,30 @@ window.SITE_CONTENT = {
       { id: "materials", label: t({ zh: "资料", en: "Materials" }), href: "./materials.html" },
       { id: "advisors", label: t({ zh: "顾问", en: "Advisors" }), href: "./advisors.html" },
       { id: "schedule", label: t({ zh: "值班安排", en: "Duty Schedule" }), href: "./schedule.html" },
-      { id: "piazza", label: t({ zh: "Piazza", en: "Piazza" }), href: "./piazza.html" } // 顺便帮您把空的 en 补上了
+      { id: "piazza", label: t({ zh: "Piazza", en: "Piazza" }), href: "./piazza.html" }
     ];
   },
   heroActions: [],
   get homeCards() {
     return [
       {
-        kicker: t({ zh: "资料入口", en: "Materials" }),
+        kicker: "",
         title: t({ zh: "Workshop 存档", en: "Workshop Archive" }),
-        body: t({ zh: "查看最近分享会和完整往期资料归档。", en: "Browse recent workshops and the full archive." }),
+        body: "",
         cta: t({ zh: "打开资料页", en: "Open Materials" }),
         href: "./materials.html",
       },
       {
-        kicker: t({ zh: "值班安排", en: "Duty Schedule" }),
+        kicker: "",
         title: t({ zh: "本周值班信息", en: "Weekly Duty Info" }),
-        body: t({ zh: "查看周一到周四晚间值班安排和地点。", en: "See the Monday-to-Thursday evening schedule and locations." }),
+        body: "",
         cta: t({ zh: "打开值班页", en: "Open Schedule" }),
         href: "./schedule.html",
       },
       {
-        kicker: t({ zh: "讨论区", en: "Piazza" }),
+        kicker: "",
         title: t({ zh: "Piazza 入口", en: "Piazza Access" }),
-        body: t({ zh: "进入课程讨论区，查看公告和常见问题。", en: "Open the course discussion board for announcements and shared Q&A." }),
+        body: "",
         cta: t({ zh: "打开 Piazza", en: "Open Piazza" }),
         href: "./piazza.html",
       },
@@ -141,55 +141,40 @@ window.SITE_CONTENT = {
   get pages() {
     return {
       materials: {
-        kicker: t({ zh: "资料页面", en: "Materials" }),
+        kicker: "",
         title: t({ zh: "往期工作坊资料", en: "Past Workshop Materials" }),
-        description: t({
-          zh: "查看 workshop 往期资料、分享回放和归档链接。",
-          en: "Browse workshop archives, recordings, and related resource links.",
-        }),
-        sectionKicker: t({ zh: "完整归档", en: "Archive" }),
-        sectionTitle: t({ zh: "全部工作坊资料", en: "All Workshop Materials" }),
+        description: "",
+        sectionKicker: "",
+        sectionTitle: "",
       },
       advisors: {
-        kicker: t({ zh: "顾问页面", en: "Advisors" }),
+        kicker: "",
         title: t({ zh: "Advisor 介绍", en: "Advisor Profiles" }),
-        description: t({
-          zh: "按年级和方向查找顾问，按需联系合适的同学或老师。",
-          en: "Find advisors by year and focus area, then reach out to the right person directly.",
-        }),
-        sectionKicker: t({ zh: "顾问团队", en: "People" }),
-        sectionTitle: t({ zh: "Advisor 名录", en: "Advisor Directory" }),
+        description: "",
+        sectionKicker: "",
+        sectionTitle: "",
       },
       schedule: {
-        kicker: t({ zh: "值班安排", en: "Duty Schedule" }),
+        kicker: "",
         title: t({ zh: "工作日晚间值班", en: "Weekday Evening Coverage" }),
-        description: t({
-          zh: "查看每周晚间值班时间、地点和单双周顾问安排。",
-          en: "Check the evening duty schedule, location, and odd/even-week advisor assignments.",
-        }),
-        sectionKicker: t({ zh: "值班覆盖", en: "Coverage" }),
-        sectionTitle: t({ zh: "周一到周四晚间值班表", en: "Monday To Thursday Evening Schedule" }),
+        description: "",
+        sectionKicker: "",
+        sectionTitle: "",
       },
       piazza: {
-        kicker: t({ zh: "Piazza", en: "Piazza" }),
+        kicker: "",
         title: t({ zh: "讨论区入口", en: "Discussion Board Access" }),
-        description: t({
-          zh: "进入 Piazza 讨论区，查看公开问答、资料澄清和课程公告。",
-          en: "Open Piazza for shared Q&A, clarifications on materials, and course announcements.",
-        }),
-        sectionKicker: t({ zh: "社区讨论", en: "Community" }),
-        sectionTitle: t({ zh: "Piazza 入口与说明", en: "Piazza Access And Notes" }),
+        description: "",
+        sectionKicker: "",
+        sectionTitle: "",
       },
     };
   },
   get pastMaterials() {
     return {
       source: "./content/workshops.md",
-      intro: t({
-        zh: "这里展示最近 3 场分享会。点击右上角按钮可以查看完整 workshop 归档；部分 JBox 链接需要 SJTU VPN。",
-        en: "These are the latest 3 workshops. Use the button on the right for the full archive; some JBox links require SJTU VPN."
-      }),
-      pageLabel: t({ zh: "查看全部资料", en: "View All Materials" }),
+      intro: "",
+      pageLabel: "",
       pageHref: "./materials.html",
       loadError: {
         title: t({ zh: "资料加载失败", en: "Unable to Load Materials" }),
@@ -508,7 +493,7 @@ window.SITE_CONTENT = {
           "7:00-9:00 PM",
           "周冯铭 / 邵禹杰 / 丁越桐",
           "王敏茜 / 王子谦 / 吴羿辰",
-          t({ zh: "龙宾楼 312", en: "LB 312" }), // 顺便帮您翻译了地点
+          t({ zh: "龙宾楼 312", en: "LB 312" }),
         ],
         [
           t({ zh: "周二", en: "Tuesday" }),
