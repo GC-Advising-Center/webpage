@@ -423,6 +423,52 @@ body::after {
   margin-bottom: 1rem;
 }
 
+.materials-search {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.materials-search__label {
+  margin-bottom: 0;
+}
+
+.search-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.search-input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(10, 44, 96, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text);
+  font: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+  opacity: 0.88;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: rgba(11, 58, 130, 0.32);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(29, 91, 191, 0.08);
+}
+
+.materials-search__meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
 .section-heading--split {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -546,6 +592,10 @@ body::after {
 
 .card {
   padding: 1.1rem;
+}
+
+.material-card--empty {
+  text-align: center;
 }
 
 .advisor-card {

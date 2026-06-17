@@ -11,6 +11,7 @@ if (!siteLanguage) {
 
 const pageType = document.body.dataset.page || "home";
 let materialsCache = null;
+let materialsSearchQuery = "";
 const openAdvisorGroups = new Set();
 
 const RESOURCE_LABELS = {
@@ -44,6 +45,8 @@ const resolveText = (value) => {
 
   return value;
 };
+
+const normalizeSearchText = (value) => resolveText(value).trim().toLowerCase();
 
 const createElement = (tag, className, text) => {
   const element = document.createElement(tag);
@@ -296,6 +299,97 @@ const renderMaterialCards = (items, targetId, limit) => {
   });
 };
 
+const formatTemplate = (template, values) => {
+  const text = resolveText(template);
+  return text.replace(/\{(\w+)\}/g, (_, key) => `${values[key] ?? ""}`);
+};
+
+const getMaterialSearchText = (item) => {
+  const parts = [item.week, item.title];
+  item.links.forEach((entry) => {
+    parts.push(entry.label);
+  });
+
+  return parts
+    .map((value) => normalizeSearchText(value))
+    .filter(Boolean)
+    .join(" ");
+};
+
+const filterMaterials = (items, query) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return items;
+  }
+
+  return items.filter((item) => getMaterialSearchText(item).includes(normalizedQuery));
+};
+
+const renderMaterialsSearchMeta = (query, count) => {
+  const meta = getById("materialsSearchMeta");
+  if (!meta) {
+    return;
+  }
+
+  const templates = siteContent.pages.materials.searchSummary;
+  if (!query) {
+    meta.textContent = formatTemplate(templates.idle, { count });
+    return;
+  }
+
+  if (count === 0) {
+    meta.textContent = formatTemplate(templates.empty, { query, count });
+    return;
+  }
+
+  meta.textContent = formatTemplate(templates.active, { query, count });
+};
+
+const renderMaterialsEmptyState = (query) => {
+  const container = getById("materialsArchive");
+  if (!container) {
+    return;
+  }
+
+  container.textContent = "";
+  const card = createElement("article", "card material-card material-card--empty");
+  card.append(
+    createContentElement(
+      "p",
+      "card__body",
+      formatTemplate(siteContent.pages.materials.searchSummary.empty, { query, count: 0 }),
+    ),
+  );
+  container.append(card);
+};
+
+const renderMaterialsList = (items) => {
+  const filteredItems = filterMaterials(items, materialsSearchQuery);
+  if (materialsSearchQuery && filteredItems.length === 0) {
+    renderMaterialsEmptyState(materialsSearchQuery);
+  } else {
+    renderMaterialCards(filteredItems, "materialsArchive");
+  }
+  renderMaterialsSearchMeta(materialsSearchQuery, filteredItems.length);
+};
+
+const setupMaterialsSearch = (items) => {
+  const input = getById("materialsSearchInput");
+  if (!input) {
+    return;
+  }
+
+  setText("materialsSearchLabel", siteContent.pages.materials.searchLabel);
+  input.placeholder = resolveText(siteContent.pages.materials.searchPlaceholder);
+  input.value = materialsSearchQuery;
+  renderMaterialsSearchMeta(materialsSearchQuery, filterMaterials(items, materialsSearchQuery).length);
+
+  input.oninput = (event) => {
+    materialsSearchQuery = event.currentTarget.value.trim();
+    renderMaterialsList(items);
+  };
+};
+
 const renderMaterialsError = (targetId) => {
   const container = getById(targetId);
   if (!container) {
@@ -472,7 +566,8 @@ const renderMaterialsPage = async () => {
 
   try {
     const items = await loadMaterials();
-    renderMaterialCards(items, "materialsArchive");
+    setupMaterialsSearch(items);
+    renderMaterialsList(items);
   } catch (error) {
     renderMaterialsError("materialsArchive");
     console.error(error);

@@ -147,6 +147,13 @@ window.SITE_CONTENT = {
         description: "",
         sectionKicker: "",
         sectionTitle: "",
+        searchLabel: t({ zh: "搜索资料", en: "Search Materials" }),
+        searchPlaceholder: t({ zh: "按标题、日期或资料标签搜索", en: "Search by title, date, or visible resource labels" }),
+        searchSummary: {
+          idle: t({ zh: "共 {count} 条资料", en: "{count} materials total" }),
+          active: t({ zh: "搜索“{query}”结果 {count} 条", en: "{count} results for \"{query}\"" }),
+          empty: t({ zh: "没有找到“{query}”相关结果", en: "No results for \"{query}\"" }),
+        },
       },
       advisors: {
         kicker: "",
