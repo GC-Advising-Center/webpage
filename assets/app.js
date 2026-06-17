@@ -419,42 +419,6 @@ const renderSchedule = () => {
   table.append(thead, tbody);
 };
 
-const renderPiazza = () => {
-  const summary = getById("piazzaSummary");
-  const links = getById("piazzaLinks");
-  const notes = getById("piazzaNotes");
-  if (!summary || !links || !notes) {
-    return;
-  }
-
-  summary.textContent = "";
-  links.textContent = "";
-  notes.textContent = "";
-
-  summary.append(
-    createContentElement("p", "card__body", siteContent.piazza.description),
-    createContentElement("p", "integration-note", siteContent.piazza.integrationNote),
-  );
-
-  siteContent.piazza.links.forEach((item) => {
-    const anchor = createElement("a", item.variant === "ghost" ? "button button--ghost" : "button");
-    anchor.href = item.href;
-    anchor.target = item.external ? "_blank" : "_self";
-    anchor.rel = item.external ? "noreferrer" : "";
-    fillText(anchor, item.label);
-    links.append(anchor);
-  });
-
-  siteContent.piazza.notes.forEach((item) => {
-    const note = createElement("article", "card note-card fade-in");
-    note.append(
-      createContentElement("h3", "card__title", item.title),
-      createContentElement("p", "card__body", item.body),
-    );
-    notes.append(note);
-  });
-};
-
 const renderPageHero = () => {
   const pageContent = siteContent.pages[pageType];
   if (!pageContent) {
@@ -477,6 +441,8 @@ const renderHomeEntryCards = () => {
   siteContent.homeCards.forEach((item) => {
     const card = createElement("a", "overview-card fade-in");
     card.href = item.href;
+    card.target = item.external ? "_blank" : "_self";
+    card.rel = item.external ? "noreferrer" : "";
     card.append(
       createContentElement("p", "meta-label", item.kicker),
       createContentElement("h2", "card__title", item.title),
@@ -537,18 +503,6 @@ const renderSchedulePage = () => {
   renderSchedule();
 };
 
-const renderPiazzaPage = () => {
-  renderPageHero();
-  setText("piazzaSectionKicker", siteContent.pages.piazza.sectionKicker);
-  setText("piazzaSectionTitle", siteContent.pages.piazza.sectionTitle);
-  toggleParentHidden(
-    "piazzaSectionTitle",
-    siteContent.pages.piazza.sectionKicker,
-    siteContent.pages.piazza.sectionTitle,
-  );
-  renderPiazza();
-};
-
 const renderPage = async () => {
   renderDocumentMetadata();
   renderBrand();
@@ -567,11 +521,6 @@ const renderPage = async () => {
 
   if (pageType === "schedule") {
     renderSchedulePage();
-    return;
-  }
-
-  if (pageType === "piazza") {
-    renderPiazzaPage();
     return;
   }
 

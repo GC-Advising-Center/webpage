@@ -8,12 +8,11 @@ This repo uses a multi-page layout with a top navigation bar, and the workshop a
 - `materials.html`: full workshop archive
 - `advisors.html`: advisor directory
 - `schedule.html`: Monday-Friday evening duty table
-- `piazza.html`: Piazza entry page and guidance
 
 ## Files You Will Usually Edit
 
 - `content/workshops.md`: workshop archive source used by the home page preview and the Materials page
-- `content/site-content.js`: site text for navigation, hero content, advisors, schedule, and Piazza
+- `content/site-content.js`: site text for navigation, hero content, advisors, and schedule
 - `assets/styles.css`: shared styling
 - `assets/app.js`: shared rendering and Markdown parsing logic
 

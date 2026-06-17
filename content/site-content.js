@@ -1,6 +1,7 @@
 const SITE_LANG_KEY = "SITE_LANG";
 const DEFAULT_SITE_LANG = "zh";
 const SUPPORTED_SITE_LANGUAGES = new Set(["zh", "en"]);
+const PIAZZA_URL = "https://piazza.com/class/l1hzqox6gb3293";
 
 const readStoredLanguage = () => {
   try {
@@ -109,7 +110,6 @@ window.SITE_CONTENT = {
       { id: "materials", label: t({ zh: "资料", en: "Materials" }), href: "./materials.html" },
       { id: "advisors", label: t({ zh: "顾问", en: "Advisors" }), href: "./advisors.html" },
       { id: "schedule", label: t({ zh: "值班安排", en: "Duty Schedule" }), href: "./schedule.html" },
-      { id: "piazza", label: t({ zh: "Piazza", en: "Piazza" }), href: "./piazza.html" }
     ];
   },
   heroActions: [],
@@ -134,7 +134,8 @@ window.SITE_CONTENT = {
         title: t({ zh: "Piazza 入口", en: "Piazza Access" }),
         body: "",
         cta: t({ zh: "打开 Piazza", en: "Open Piazza" }),
-        href: "./piazza.html",
+        href: PIAZZA_URL,
+        external: true,
       },
     ];
   },
@@ -157,13 +158,6 @@ window.SITE_CONTENT = {
       schedule: {
         kicker: "",
         title: t({ zh: "工作日晚间值班", en: "Weekday Evening Coverage" }),
-        description: "",
-        sectionKicker: "",
-        sectionTitle: "",
-      },
-      piazza: {
-        kicker: "",
-        title: t({ zh: "讨论区入口", en: "Discussion Board Access" }),
         description: "",
         sectionKicker: "",
         sectionTitle: "",
@@ -516,35 +510,6 @@ window.SITE_CONTENT = {
           "张果然 / 陈洁仪 / 王飞羽",
           t({ zh: "龙宾楼 312", en: "LB 312" }),
         ],
-      ],
-    };
-  },
-  get piazza() {
-    return {
-      description: t({
-        zh: "建议将可复用的问题和公开通知发到 Piazza，方便大家统一查看和检索。",
-        en: "Use Piazza for reusable questions and shared announcements so everyone can read and search them later.",
-      }),
-      integrationNote: t({
-        zh: "如果问题只和个人安排有关，再单独邮件联系相关顾问。",
-        en: "If your question is only about a personal situation, email the relevant advisor directly instead.",
-      }),
-      links: [
-        {
-          label: t({ zh: "打开 Piazza", en: "Open Piazza" }),
-          href: "https://piazza.com/class/l1hzqox6gb3293",
-          external: true,
-          variant: "primary",
-        },
-      ],
-      notes: [
-        {
-          title: t({ zh: "Piazza 的内容", en: "What belongs on Piazza" }),
-          body: t({
-            zh: "适合发布那些答案可复用的问题、对资料的澄清，以及所有人都应该看到的公告。",
-            en: "Use it for questions with reusable answers, clarifications on materials, and announcements that everyone should see."
-          }),
-        },
       ],
     };
   },

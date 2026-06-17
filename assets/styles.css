@@ -302,8 +302,7 @@ body::after {
 .hero__description .bilingual__en,
 .section-intro .bilingual__en,
 .card__body .bilingual__en,
-.meta-value .bilingual__en,
-.integration-note .bilingual__en {
+.meta-value .bilingual__en {
   font-size: 0.78em;
   line-height: 1.6;
   opacity: 0.62;
@@ -323,8 +322,7 @@ body::after {
 .hero__description,
 .section-intro,
 .card__body,
-.meta-value,
-.integration-note {
+.meta-value {
   color: var(--muted);
   line-height: 1.75;
 }
@@ -336,8 +334,7 @@ body::after {
 }
 
 .hero__actions,
-.material-links,
-.piazza-links {
+.material-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -416,7 +413,6 @@ body::after {
 .section-heading p,
 .card__title,
 .material-meta,
-.integration-note,
 .detail-label {
   margin: 0;
 }
@@ -444,8 +440,7 @@ body::after {
 
 .overview-grid,
 .material-list,
-.advisor-grid,
-.piazza-notes {
+.advisor-grid {
   display: grid;
   gap: 1rem;
 }
@@ -645,24 +640,6 @@ body::after {
   border-radius: 999px;
   background: rgba(29, 91, 191, 0.08);
   color: var(--muted);
-}
-
-.piazza-summary {
-  display: grid;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-.piazza-links {
-  margin-bottom: 1rem;
-}
-
-.piazza-notes {
-  grid-template-columns: 1fr;
-}
-
-.note-card {
-  background: rgba(255, 255, 255, 0.78);
 }
 
 .table-shell {
