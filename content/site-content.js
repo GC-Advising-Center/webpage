@@ -2,6 +2,7 @@ const SITE_LANG_KEY = "SITE_LANG";
 const DEFAULT_SITE_LANG = "zh";
 const SUPPORTED_SITE_LANGUAGES = new Set(["zh", "en"]);
 const PIAZZA_URL = "https://piazza.com/class/l1hzqox6gb3293";
+const SITE_DATA_SOURCE = "./content/site-data.md";
 
 const readStoredLanguage = () => {
   try {
@@ -173,15 +174,15 @@ window.SITE_CONTENT = {
   },
   get pastMaterials() {
     return {
-      source: "./content/workshops.md",
+      source: SITE_DATA_SOURCE,
       intro: "",
       pageLabel: "",
       pageHref: "./materials.html",
       loadError: {
         title: t({ zh: "资料加载失败", en: "Unable to Load Materials" }),
         body: t({
-          zh: "当前无法读取 workshop Markdown 存档。请检查 content/workshops.md 是否存在，以及是否通过本地服务器或 GitHub Pages 访问页面。",
-          en: "The workshop Markdown archive could not be read. Please make sure content/workshops.md exists and the site is being accessed through a local server or GitHub Pages."
+          zh: "当前无法读取网站数据 Markdown。请检查 content/site-data.md 是否存在，以及是否通过本地服务器或 GitHub Pages 访问页面。",
+          en: "The site data Markdown could not be read. Please make sure content/site-data.md exists and the site is being accessed through a local server or GitHub Pages."
         }),
       },
     };
@@ -488,36 +489,10 @@ window.SITE_CONTENT = {
         t({ zh: "双周顾问", en: "Even-week Advisors" }),
         t({ zh: "地点", en: "Location" }),
       ],
-      rows: [
-        [
-          t({ zh: "周一", en: "Monday" }),
-          "7:00-9:00 PM",
-          "周冯铭 / 邵禹杰 / 丁越桐",
-          "王敏茜 / 王子谦 / 吴羿辰",
-          t({ zh: "龙宾楼 312", en: "LB 312" }),
-        ],
-        [
-          t({ zh: "周二", en: "Tuesday" }),
-          "7:00-9:00 PM",
-          "戴琤妍 / 倪银晨",
-          "王子睿 / 陈文新 / 李一爱",
-          t({ zh: "龙宾楼 312", en: "LB 312" }),
-        ],
-        [
-          t({ zh: "周三", en: "Wednesday" }),
-          "7:00-9:00 PM",
-          "王一敏 / 班雨桐 / 汤礼维",
-          "叶承嵘 / 班雨桐",
-          t({ zh: "龙宾楼 312", en: "LB 312" }),
-        ],
-        [
-          t({ zh: "周四", en: "Thursday" }),
-          "7:00-9:00 PM",
-          "唐璟帆 / 刘乐思 / 张浩然",
-          "张果然 / 陈洁仪 / 王飞羽",
-          t({ zh: "龙宾楼 312", en: "LB 312" }),
-        ],
-      ],
+      loadError: t({
+        zh: "当前无法读取值班表数据，请检查 content/site-data.md 中的 Schedule 部分。",
+        en: "Unable to load the duty schedule. Please check the Schedule section in content/site-data.md.",
+      }),
     };
   },
 };

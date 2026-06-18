@@ -1,6 +1,6 @@
 # GitHub Pages Course Information Site
 
-This repo uses a multi-page layout with a top navigation bar, and the workshop archive is now driven by a Markdown source file.
+This repo uses a multi-page layout with a top navigation bar, and the frequently updated site data is driven by a Markdown source file.
 
 ## Main Pages
 
@@ -11,18 +11,46 @@ This repo uses a multi-page layout with a top navigation bar, and the workshop a
 
 ## Files You Will Usually Edit
 
-- `content/workshops.md`: workshop archive source used by the home page preview and the Materials page
+- `content/site-data.md`: the main editable data file for the duty schedule and workshop archive
 - `content/site-content.js`: site text for navigation, hero content, advisors, and schedule
 - `assets/styles.css`: shared styling
 - `assets/app.js`: shared rendering and Markdown parsing logic
 
+## Main Editing Workflow
+
+For most routine updates, only edit `content/site-data.md`.
+
+It currently powers:
+
+- the full workshop archive
+- the home page workshop preview
+- the duty schedule table
+
+## How To Update The Duty Schedule
+
+Open `content/site-data.md` and edit the table under `## Schedule`.
+
+Use this format:
+
+```md
+| 日期 | 时间 | 单周顾问 | 双周顾问 | 地点 |
+| --- | --- | --- | --- | --- |
+| 周一 | 7:00-9:00 PM | 顾问A / 顾问B | 顾问C / 顾问D | 龙宾楼 312 |
+```
+
+Notes:
+
+- Keep the header row and separator row as-is.
+- Each line becomes one row in the schedule table.
+- You can write `周一` 到 `周四` directly.
+
 ## How To Add A New Workshop Entry
 
-The site reads workshop data directly from `content/workshops.md`.
+The site reads workshop data from the `## Workshops` section in `content/site-data.md`.
 
 When you add a new item:
 
-1. Open `content/workshops.md`.
+1. Open `content/site-data.md`.
 2. Add the newest entry near the top, above the older workshop items.
 3. Follow the same structure as the existing archive.
 
@@ -52,9 +80,9 @@ Notes:
 
 ## How The Materials Section Works
 
-- The home page shows the first 3 workshop entries from `content/workshops.md`.
+- The home page shows the first 3 workshop entries from `content/site-data.md`.
 - The Materials page shows the full parsed archive.
-- To keep the newest items on the home page, always insert new entries near the top of `content/workshops.md`.
+- To keep the newest items on the home page, always insert new entries near the top of the `## Workshops` section.
 
 ## GitHub Pages Deployment
 

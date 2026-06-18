@@ -11,6 +11,7 @@ if (!siteLanguage) {
 
 const pageType = document.body.dataset.page || "home";
 let materialsCache = null;
+let siteDataCache = null;
 let materialsSearchQuery = "";
 const openAdvisorGroups = new Set();
 
@@ -29,6 +30,17 @@ const TITLE_FALLBACKS = {
     zh: "夏季学期高阶课工作坊",
     en: "Summer Advanced Courses Workshop",
   },
+};
+
+const DAY_TRANSLATIONS = {
+  Monday: { zh: "周一", en: "Monday" },
+  Tuesday: { zh: "周二", en: "Tuesday" },
+  Wednesday: { zh: "周三", en: "Wednesday" },
+  Thursday: { zh: "周四", en: "Thursday" },
+  "周一": { zh: "周一", en: "Monday" },
+  "周二": { zh: "周二", en: "Tuesday" },
+  "周三": { zh: "周三", en: "Wednesday" },
+  "周四": { zh: "周四", en: "Thursday" },
 };
 
 const isLocalizedValue = (value) => siteLanguage.isLocalizedValue(value);
@@ -202,18 +214,80 @@ const parseWorkshopMarkdown = (markdown) => {
   return items;
 };
 
+const getMarkdownSection = (markdown, sectionTitle) => {
+  const lines = markdown.split(/\r?\n/);
+  const heading = `## ${sectionTitle}`;
+  const startIndex = lines.findIndex((line) => line.trim() === heading);
+
+  if (startIndex === -1) {
+    return "";
+  }
+
+  const sectionLines = [];
+  for (let index = startIndex + 1; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.startsWith("## ")) {
+      break;
+    }
+    sectionLines.push(line);
+  }
+
+  return sectionLines.join("\n").trim();
+};
+
+const parseScheduleMarkdown = (markdown) => {
+  const scheduleSection = getMarkdownSection(markdown, "Schedule");
+  if (!scheduleSection) {
+    return [];
+  }
+
+  const lines = scheduleSection
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return lines
+    .filter((line) => line.startsWith("|") && !/^(\|\s*-+\s*)+\|?$/.test(line))
+    .slice(1)
+    .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()))
+    .filter((row) => row.length >= 5)
+    .map((row) => [
+      DAY_TRANSLATIONS[row[0]] || { zh: row[0], en: row[0] },
+      row[1],
+      row[2],
+      row[3],
+      {
+        zh: row[4] === "LB 312" ? "龙宾楼 312" : row[4],
+        en: row[4] === "龙宾楼 312" ? "LB 312" : row[4],
+      },
+    ]);
+};
+
+const loadSiteData = async () => {
+  if (siteDataCache) {
+    return siteDataCache;
+  }
+
+  const response = await fetch(siteContent.pastMaterials.source);
+  if (!response.ok) {
+    throw new Error(`Failed to load site data: ${response.status}`);
+  }
+
+  const markdown = await response.text();
+  siteDataCache = {
+    materials: parseWorkshopMarkdown(getMarkdownSection(markdown, "Workshops")),
+    scheduleRows: parseScheduleMarkdown(markdown),
+  };
+  return siteDataCache;
+};
+
 const loadMaterials = async () => {
   if (materialsCache) {
     return materialsCache;
   }
 
-  const response = await fetch(siteContent.pastMaterials.source);
-  if (!response.ok) {
-    throw new Error(`Failed to load materials archive: ${response.status}`);
-  }
-
-  const markdown = await response.text();
-  materialsCache = parseWorkshopMarkdown(markdown);
+  const siteData = await loadSiteData();
+  materialsCache = siteData.materials;
   return materialsCache;
 };
 
@@ -485,7 +559,7 @@ const renderAdvisorAccordion = () => {
   });
 };
 
-const renderSchedule = () => {
+const renderSchedule = (rows) => {
   const table = getById("dutyScheduleTable");
   if (!table) {
     return;
@@ -502,7 +576,7 @@ const renderSchedule = () => {
   thead.append(headRow);
 
   const tbody = createElement("tbody");
-  siteContent.dutySchedule.rows.forEach((row) => {
+  rows.forEach((row) => {
     const tr = createElement("tr");
     row.forEach((value) => {
       tr.append(createContentElement("td", "", value));
@@ -511,6 +585,22 @@ const renderSchedule = () => {
   });
 
   table.append(thead, tbody);
+};
+
+const renderScheduleError = () => {
+  const table = getById("dutyScheduleTable");
+  if (!table) {
+    return;
+  }
+
+  table.textContent = "";
+  const tbody = createElement("tbody");
+  const tr = createElement("tr");
+  const td = createElement("td", "", siteContent.dutySchedule.loadError);
+  td.colSpan = siteContent.dutySchedule.columns.length;
+  tr.append(td);
+  tbody.append(tr);
+  table.append(tbody);
 };
 
 const renderPageHero = () => {
@@ -586,7 +676,7 @@ const renderAdvisorsPage = () => {
   renderAdvisorAccordion();
 };
 
-const renderSchedulePage = () => {
+const renderSchedulePage = async () => {
   renderPageHero();
   setText("scheduleTableKicker", siteContent.pages.schedule.sectionKicker);
   setText("scheduleTableTitle", siteContent.pages.schedule.sectionTitle);
@@ -595,7 +685,13 @@ const renderSchedulePage = () => {
     siteContent.pages.schedule.sectionKicker,
     siteContent.pages.schedule.sectionTitle,
   );
-  renderSchedule();
+  try {
+    const siteData = await loadSiteData();
+    renderSchedule(siteData.scheduleRows);
+  } catch (error) {
+    renderScheduleError();
+    console.error(error);
+  }
 };
 
 const renderPage = async () => {
@@ -615,7 +711,7 @@ const renderPage = async () => {
   }
 
   if (pageType === "schedule") {
-    renderSchedulePage();
+    await renderSchedulePage();
     return;
   }
 
