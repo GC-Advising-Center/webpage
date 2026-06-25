@@ -11,8 +11,8 @@ This repo uses a multi-page layout with a top navigation bar, and the frequently
 
 ## Files You Will Usually Edit
 
-- `content/site-data.md`: the main editable data file for the duty schedule and workshop archive
-- `content/site-content.js`: site text for navigation, hero content, advisors, and schedule
+- `content/site-data.md`: the main editable data file for the advisor directory, duty schedule, and workshop archive
+- `content/site-content.js`: site text for navigation, hero content, and page-level labels
 - `assets/styles.css`: shared styling
 - `assets/app.js`: shared rendering and Markdown parsing logic
 
@@ -22,9 +22,36 @@ For most routine updates, only edit `content/site-data.md`.
 
 It currently powers:
 
+- the advisor directory
 - the full workshop archive
 - the home page workshop preview
 - the duty schedule table
+
+## How To Update Advisor Profiles
+
+The site reads advisor data from the `## Advisors` section in `content/site-data.md`.
+
+Each advisor group uses:
+
+- one `### 中文分组名 | *English Group Name*` heading
+- one Markdown table directly under that heading
+
+Use this format:
+
+```md
+### 大三 | *Juniors*
+
+| 姓名 | 中文角色 | English Role | 邮箱 | 中文咨询方向 | English Expertise | 中文简介 | English Bio |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 张三 | 大三 ECE 专业 | Junior, ECE | zhangsan@example.com | 学业规划<br>科研入门 | Academic planning<br>Getting started with research | 欢迎来聊天 | Feel free to reach out. |
+```
+
+Notes:
+
+- Keep the 8-column table header as-is.
+- Use `<br>` inside the expertise cells when one advisor has multiple topics.
+- The Chinese and English fields are rendered directly on the bilingual site, so update both sides together when possible.
+- You can add, remove, or reorder groups and advisors in Markdown without changing code.
 
 ## How To Update The Duty Schedule
 

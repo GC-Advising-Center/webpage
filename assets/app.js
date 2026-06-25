@@ -139,6 +139,18 @@ const parseNoteSuffix = (suffix) => {
   };
 };
 
+const isMarkdownDividerRow = (line) => /^(\|\s*:?-+:?\s*)+\|?$/.test(line);
+
+const parseMarkdownTableRow = (line) => line
+  .split("|")
+  .slice(1, -1)
+  .map((cell) => cell.trim());
+
+const parseMarkdownCellList = (cell) => cell
+  .split(/<br\s*\/?>/i)
+  .map((entry) => entry.trim())
+  .filter(Boolean);
+
 const parseWorkshopMarkdown = (markdown) => {
   const items = [];
   const lines = markdown.split(/\r?\n/);
@@ -214,6 +226,83 @@ const parseWorkshopMarkdown = (markdown) => {
   return items;
 };
 
+const parseAdvisorMarkdown = (markdown) => {
+  const advisorsSection = getMarkdownSection(markdown, "Advisors");
+  if (!advisorsSection) {
+    return [];
+  }
+
+  const groups = [];
+  const lines = advisorsSection.split(/\r?\n/);
+  let currentGroup = null;
+
+  const pushCurrentGroup = () => {
+    if (!currentGroup || currentGroup.items.length === 0) {
+      currentGroup = null;
+      return;
+    }
+
+    groups.push(currentGroup);
+    currentGroup = null;
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const headingMatch = trimmed.match(/^###\s+(.+)$/);
+    if (headingMatch) {
+      pushCurrentGroup();
+      currentGroup = {
+        id: `advisor-group-${groups.length + 1}`,
+        title: parseTitlePair(headingMatch[1]),
+        items: [],
+      };
+      return;
+    }
+
+    if (!currentGroup || !trimmed.startsWith("|") || isMarkdownDividerRow(trimmed)) {
+      return;
+    }
+
+    const row = parseMarkdownTableRow(trimmed);
+    const headerLabel = row[0]?.toLowerCase();
+    if (row.length < 8 || headerLabel === "姓名" || headerLabel === "name") {
+      return;
+    }
+
+    const [name, roleZh, roleEn, email, expertiseZh, expertiseEn, bioZh, bioEn] = row;
+    const expertiseZhList = parseMarkdownCellList(expertiseZh);
+    const expertiseEnList = parseMarkdownCellList(expertiseEn);
+    const expertise = Array.from(
+      { length: Math.max(expertiseZhList.length, expertiseEnList.length) },
+      (_, index) => ({
+        zh: expertiseZhList[index] || expertiseEnList[index] || "",
+        en: expertiseEnList[index] || expertiseZhList[index] || "",
+      }),
+    ).filter((entry) => entry.zh || entry.en);
+
+    currentGroup.items.push({
+      name,
+      role: {
+        zh: roleZh || roleEn,
+        en: roleEn || roleZh,
+      },
+      email,
+      expertise,
+      bio: {
+        zh: bioZh || bioEn,
+        en: bioEn || bioZh,
+      },
+    });
+  });
+
+  pushCurrentGroup();
+  return groups;
+};
+
 const getMarkdownSection = (markdown, sectionTitle) => {
   const lines = markdown.split(/\r?\n/);
   const heading = `## ${sectionTitle}`;
@@ -247,9 +336,9 @@ const parseScheduleMarkdown = (markdown) => {
     .filter(Boolean);
 
   return lines
-    .filter((line) => line.startsWith("|") && !/^(\|\s*-+\s*)+\|?$/.test(line))
+    .filter((line) => line.startsWith("|") && !isMarkdownDividerRow(line))
     .slice(1)
-    .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()))
+    .map(parseMarkdownTableRow)
     .filter((row) => row.length >= 5)
     .map((row) => [
       DAY_TRANSLATIONS[row[0]] || { zh: row[0], en: row[0] },
@@ -276,6 +365,7 @@ const loadSiteData = async () => {
   const markdown = await response.text();
   siteDataCache = {
     materials: parseWorkshopMarkdown(getMarkdownSection(markdown, "Workshops")),
+    advisorGroups: parseAdvisorMarkdown(markdown),
     scheduleRows: parseScheduleMarkdown(markdown),
   };
   return siteDataCache;
@@ -479,7 +569,7 @@ const renderMaterialsError = (targetId) => {
   container.append(card);
 };
 
-const renderAdvisorAccordion = () => {
+const renderAdvisorAccordion = (groups) => {
   const container = getById("accordionContainer");
   if (!container) {
     return;
@@ -487,7 +577,7 @@ const renderAdvisorAccordion = () => {
 
   container.textContent = "";
 
-  siteContent.advisors.groups.forEach((group, index) => {
+  groups.forEach((group, index) => {
     const defaultExpanded = openAdvisorGroups.size === 0 && index === 0;
     const isExpanded = openAdvisorGroups.has(group.id) || defaultExpanded;
 
@@ -557,6 +647,21 @@ const renderAdvisorAccordion = () => {
       }
     });
   });
+};
+
+const renderAdvisorsError = () => {
+  const container = getById("accordionContainer");
+  if (!container) {
+    return;
+  }
+
+  container.textContent = "";
+  const card = createElement("article", "card material-card");
+  card.append(
+    createContentElement("h3", "card__title", siteContent.advisors.loadError.title),
+    createContentElement("p", "card__body", siteContent.advisors.loadError.body),
+  );
+  container.append(card);
 };
 
 const renderSchedule = (rows) => {
@@ -664,7 +769,7 @@ const renderMaterialsPage = async () => {
   }
 };
 
-const renderAdvisorsPage = () => {
+const renderAdvisorsPage = async () => {
   renderPageHero();
   setText("advisorDirectoryKicker", siteContent.pages.advisors.sectionKicker);
   setText("advisorDirectoryTitle", siteContent.pages.advisors.sectionTitle);
@@ -673,7 +778,18 @@ const renderAdvisorsPage = () => {
     siteContent.pages.advisors.sectionKicker,
     siteContent.pages.advisors.sectionTitle,
   );
-  renderAdvisorAccordion();
+
+  try {
+    const siteData = await loadSiteData();
+    if (siteData.advisorGroups.length === 0) {
+      throw new Error("No advisor profiles found in site data.");
+    }
+
+    renderAdvisorAccordion(siteData.advisorGroups);
+  } catch (error) {
+    renderAdvisorsError();
+    console.error(error);
+  }
 };
 
 const renderSchedulePage = async () => {
@@ -706,7 +822,7 @@ const renderPage = async () => {
   }
 
   if (pageType === "advisors") {
-    renderAdvisorsPage();
+    await renderAdvisorsPage();
     return;
   }
 
